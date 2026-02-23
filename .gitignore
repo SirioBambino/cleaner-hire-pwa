@@ -14,7 +14,6 @@ dev-dist
 
 /test-results/
 playwright-report
-supabase/.temp
 .vercel
 
 .vscode/*
