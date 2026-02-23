@@ -1,10 +1,3 @@
----
-name: Pull Request template
-about: Use this template when creating a new PR.
-title: 'PR: '
-
----
-
 ## 1. Description
 <!-- A brief summary of what this PR introduces and the high-level technical changes made. -->
 
