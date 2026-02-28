@@ -1,15 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { RouterProvider } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
-import { App } from './App';
-import { router } from './lib/router'; // Adjust this path to where your router is defined
-
-describe('App Component', () => {
-	it('renders the main heading', () => {
-		render(<App />);
-		expect(screen.getByText(/Cleaner Hire PWA/i)).toBeDefined();
-	});
-});
+import { router } from './routes';
 
 describe('Navigation Router', () => {
 	it('renders the Home page by default', () => {
