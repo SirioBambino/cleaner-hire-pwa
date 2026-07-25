@@ -63,6 +63,12 @@ export function getBucketConfig(bucketName: string): BucketConfig {
 	);
 }
 
+export function getMimeType(fileName: string): string {
+	const lastDotIndex = fileName.lastIndexOf('.');
+	const ext = lastDotIndex !== -1 ? fileName.slice(lastDotIndex + 1).toLowerCase() : '';
+	return EXTENSION_MIME_MAP[ext] ?? 'application/octet-stream';
+}
+
 export const mediaService = {
 	async listFiles(
 		folderId: string,
@@ -105,7 +111,13 @@ export const mediaService = {
 		const fileName = `${crypto.randomUUID()}${fileExt ? `.${fileExt}` : ''}`;
 		const filePath = `${folderId}/${fileName}`;
 
-		const contentType = file.type || (EXTENSION_MIME_MAP[fileExt] ?? undefined);
+		const contentType = file.type || getMimeType(file.name);
+
+		if (contentType === 'application/octet-stream') {
+			const errorMsg = `Unsupported file type for "${file.name}". Could not determine a valid video or image MIME type.`;
+			console.error(`[mediaService] ${errorMsg}`);
+			return { path: null, error: errorMsg };
+		}
 
 		const { error: uploadError } = await supabase.storage.from(bucket).upload(filePath, file, {
 			contentType,
