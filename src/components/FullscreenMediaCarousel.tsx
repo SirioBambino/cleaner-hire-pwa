@@ -27,6 +27,7 @@ import {
 	MediaPlayerVolumeIndicator,
 } from '@/components/ui/media-player';
 import { useCarousel } from '@/hooks/useCarousel';
+import { getMimeType } from '@/lib/mediaService';
 import { ImageWithFallback } from './ImageWithFallback';
 
 interface MediaItem {
@@ -202,12 +203,7 @@ export function FullscreenMediaCarousel({
 							<MediaPlayerVideo className="bg-black" poster={videoPoster}>
 								<source
 									src={safeMedia[currentIndex]?.url}
-									type={
-										safeMedia[currentIndex]?.url?.match(/\.(\w+)(?:\?|$)/)?.[1]?.toLowerCase() ===
-										'webm'
-											? 'video/webm'
-											: 'video/mp4'
-									}
+									type={getMimeType(safeMedia[currentIndex]?.url ?? '')}
 								/>
 							</MediaPlayerVideo>
 							<MediaPlayerLoading />
