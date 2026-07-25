@@ -92,6 +92,7 @@ export function PropertyDetailView({ property, onEdit, onDelete }: PropertyDetai
 						<div className="flex flex-col lg:flex-row gap-4 overflow-hidden">
 							<div className="relative aspect-video lg:flex-1 bg-muted rounded-lg overflow-hidden shrink-0 lg:shrink">
 								<ImageWithFallback
+									key={activeImage}
 									src={activeImage}
 									className="size-full object-contain"
 									alt="Property"
