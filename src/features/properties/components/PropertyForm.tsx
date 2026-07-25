@@ -121,7 +121,8 @@ export function PropertyForm({
 		}
 
 		const { has_main_image, ...databaseValues } = values;
-		const { mainImagePath, finalExtraImagesPaths } = await uploadImages(user.id);
+		const effectiveUserId = hostId ?? user.id;
+		const { mainImagePath, finalExtraImagesPaths } = await uploadImages(effectiveUserId);
 
 		const payload: PropertyInsert = {
 			...databaseValues,
