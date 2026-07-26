@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DICT } from '@/dictionary';
 import { CleaningDetailView } from '@/features/cleanings/components/CleaningDetailView';
 import { CleaningForm } from '@/features/cleanings/components/CleaningForm';
-import { HostCleaningGrid } from '@/features/cleanings/components/HostCleaningGrid';
+import { CleaningGrid } from '@/features/cleanings/components/CleaningGrid';
 import { useHostCleanings } from '@/features/cleanings/hooks/useHostCleanings';
 import { ManagementLayout } from '@/layouts/ManagementLayout';
 
@@ -40,10 +40,11 @@ export function HostCleaningsPage() {
 				</div>
 			}
 			grid={
-				<HostCleaningGrid
+				<CleaningGrid
 					onView={modal.openView}
 					onEdit={modal.openEdit}
 					onDelete={modal.setDeletingId}
+					userRole="host"
 				/>
 			}
 			isViewOpen={modal.isViewOpen}

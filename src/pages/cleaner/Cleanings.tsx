@@ -2,8 +2,8 @@
 
 import { CalendarX } from 'lucide-react';
 import { DICT } from '@/dictionary';
-import { CleanerCleaningGrid } from '@/features/cleanings/components/CleanerCleaningGrid';
 import { CleaningDetailView } from '@/features/cleanings/components/CleaningDetailView';
+import { CleaningGrid } from '@/features/cleanings/components/CleaningGrid';
 import { useCleanerCleanings } from '@/features/cleanings/hooks/useCleanerCleanings';
 import { ManagementLayout } from '@/layouts/ManagementLayout';
 
@@ -24,7 +24,7 @@ export function CleanerCleaningsPage() {
 					<h3 className="text-lg font-semibold">{DICT.CLEANINGS.EMPTY.MESSAGE_CLEANER}</h3>
 				</div>
 			}
-			grid={<CleanerCleaningGrid onView={modal.openView} />}
+			grid={<CleaningGrid onView={modal.openView} userRole="cleaner" />}
 			isViewOpen={modal.isViewOpen}
 			isEditOrCreateOpen={false}
 			onClose={modal.handleClose}
