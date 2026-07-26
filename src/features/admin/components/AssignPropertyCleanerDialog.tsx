@@ -17,52 +17,53 @@ import {
 } from '@/components/ui/select';
 import { DICT } from '@/dictionary';
 
-export interface AssignCleanerDialogProps {
+interface AssignPropertyCleanerDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	propertyAddress: string;
+	currentCleanerId: string | null;
 	availableCleaners: { id: string; full_name: string | null }[];
-	selectedCleanerId: string;
-	onSelectCleaner: (id: string) => void;
-	onAssign: () => void;
-	onCancel?: () => void;
+	onSave: (cleanerId: string | null) => Promise<void>;
 }
 
-export function AssignCleanerDialog({
+export function AssignPropertyCleanerDialog({
 	open,
 	onOpenChange,
+	propertyAddress,
+	currentCleanerId,
 	availableCleaners,
-	selectedCleanerId,
-	onSelectCleaner,
-	onAssign,
-	onCancel,
-}: AssignCleanerDialogProps) {
-	const handleCancel = () => {
-		if (onCancel) {
-			onCancel();
-		}
-		onOpenChange(false);
-	};
+	onSave,
+}: AssignPropertyCleanerDialogProps) {
+	const dict = DICT.ADMIN.PROPERTY_ASSIGN_CLEANER;
 
-	const currentCleaner = availableCleaners.find((c) => c.id === selectedCleanerId);
+	const currentCleaner = availableCleaners.find((c) => c.id === currentCleanerId);
 	const displayValue = currentCleaner?.full_name || '';
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent>
 				<DialogHeader>
-					<DialogTitle>{DICT.CLEANINGS.ASSIGN_CLEANER.TITLE}</DialogTitle>
-					<DialogDescription>{DICT.CLEANINGS.ASSIGN_CLEANER.DESCRIPTION}</DialogDescription>
+					<DialogTitle>{dict.TITLE}</DialogTitle>
+					<DialogDescription>
+						{dict.DESCRIPTION.replace('{address}', propertyAddress)}
+					</DialogDescription>
 				</DialogHeader>
 				<div className="space-y-4">
-					<Select value={selectedCleanerId} onValueChange={onSelectCleaner}>
-						<SelectTrigger className="w-full" aria-label={DICT.CLEANINGS.ASSIGN_CLEANER.SELECT}>
+					<Select
+						value={currentCleanerId ?? 'none'}
+						onValueChange={(value) => {
+							const newCleanerId = value === 'none' ? null : value;
+							onSave(newCleanerId);
+						}}>
+						<SelectTrigger className="w-full" aria-label={dict.LABEL_SELECT}>
 							<SelectValue
-								placeholder={DICT.CLEANINGS.ASSIGN_CLEANER.SELECT}
+								placeholder={dict.LABEL_SELECT}
 								className={displayValue ? 'text-foreground' : ''}>
-								{displayValue || DICT.CLEANINGS.ASSIGN_CLEANER.SELECT}
+								{displayValue || dict.LABEL_SELECT}
 							</SelectValue>
 						</SelectTrigger>
-						<SelectContent emptyMessage={DICT.CLEANINGS.ASSIGN_CLEANER.EMPTY}>
+						<SelectContent>
+							<SelectItem value="none">{dict.NO_CLEANER}</SelectItem>
 							{availableCleaners.map((cleaner) => (
 								<SelectItem key={cleaner.id} value={cleaner.id}>
 									{cleaner.full_name || 'Unknown'}
@@ -71,10 +72,9 @@ export function AssignCleanerDialog({
 						</SelectContent>
 					</Select>
 					<div className="flex justify-end gap-2">
-						<Button variant="outline" onClick={handleCancel}>
+						<Button variant="outline" onClick={() => onOpenChange(false)}>
 							{DICT.COMMON.ACTIONS.CANCEL}
 						</Button>
-						<Button onClick={onAssign}>{DICT.COMMON.ACTIONS.ASSIGN_CLEANER}</Button>
 					</div>
 				</div>
 			</DialogContent>
