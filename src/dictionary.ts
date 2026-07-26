@@ -568,6 +568,18 @@ export const DICT = {
 				},
 			},
 		},
+		PROPERTY_PRICE_DIALOG: {
+			TITLE: 'Set Property Prices',
+			DESCRIPTION: 'Set the prices for {address}.',
+			LABEL_PRICE: 'Price per cleaning',
+			PLACEHOLDER_PRICE: '50.00',
+			LABEL_CLEANER_PAY: 'Cleaner pay',
+			PLACEHOLDER_CLEANER_PAY: 'Auto-calculated',
+			DESCRIPTION_CLEANER_PAY: 'Leave empty to use the automatic cleaner pay calculation.',
+			PRICE_REQUIRED: 'Please enter a valid price greater than 0',
+			CLEANER_PAY_INVALID: 'Please enter a valid cleaner pay or leave it empty',
+			TOAST_SUCCESS: 'Property prices updated successfully',
+		},
 		ANALYTICS: {
 			TITLE: 'Analytics',
 			DATE_RANGE: {

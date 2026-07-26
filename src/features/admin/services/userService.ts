@@ -160,10 +160,15 @@ export const userService = {
 		return { data: hostDetail.data, error: null };
 	},
 
-	async updatePropertyPrice(propertyId: string, price: number): Promise<ActionResult<void>> {
+	async updatePropertyPrice(
+		propertyId: string,
+		price: number,
+		cleanerPayOverride?: number,
+	): Promise<ActionResult<void>> {
 		const { error } = await supabase.rpc('admin_update_property_price', {
 			p_property_id: propertyId,
 			p_price: price,
+			p_cleaner_pay_override: cleanerPayOverride,
 		});
 
 		if (error) {
