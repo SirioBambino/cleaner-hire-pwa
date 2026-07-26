@@ -405,9 +405,11 @@ export const DICT = {
 		},
 		ASSIGN_CLEANER: {
 			TITLE: 'Assign Cleaner',
+			DESCRIPTION: 'Select which cleaner to assign',
 			SELECT: 'Select a cleaner',
 			TOAST_SUCCESS: 'Cleaner assigned',
 			TOAST_ERROR: 'Please select a cleaner',
+			EMPTY: 'No available cleaners',
 		},
 	},
 	ACCOUNT: {
@@ -579,6 +581,17 @@ export const DICT = {
 			PRICE_REQUIRED: 'Please enter a valid price greater than 0',
 			CLEANER_PAY_INVALID: 'Please enter a valid cleaner pay or leave it empty',
 			TOAST_SUCCESS: 'Property prices updated successfully',
+		},
+		PROPERTY_ASSIGN_CLEANER: {
+			BUTTON_ASSIGN: 'Assign Main Cleaner',
+			BUTTON_CHANGE: 'Change Main Cleaner',
+			TITLE: 'Assign Main Cleaner',
+			DESCRIPTION:
+				'Assign a main cleaner to {address}. This cleaner will be automatically assigned to all future cleanings at this property.',
+			LABEL_SELECT: 'Select a cleaner',
+			NO_CLEANER: 'No main cleaner assigned',
+			TOAST_SUCCESS: 'Main cleaner assigned successfully',
+			TOAST_CLEARED: 'Main cleaner removed',
 		},
 		ANALYTICS: {
 			TITLE: 'Analytics',

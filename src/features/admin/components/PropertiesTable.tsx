@@ -1,6 +1,6 @@
 'use client';
 
-import { Banknote, Eye } from 'lucide-react';
+import { Banknote, Eye, UserCheck } from 'lucide-react';
 import { useMemo } from 'react';
 import { DataTable } from '@/components/DataTable';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ export interface PropertiesTableProps {
 	emptyMessage?: string;
 	onView?: (id: string) => void;
 	onEditPrice?: (property: Property) => void;
+	onAssignCleaner?: (property: Property) => void;
 	page?: number;
 	totalCount?: number;
 	pageSize?: number;
@@ -42,6 +43,7 @@ export function PropertiesTable({
 	emptyMessage = DICT.ADMIN.CLEANINGS.DETAIL.HOST_DETAIL.EMPTY_PROPERTIES,
 	onView,
 	onEditPrice,
+	onAssignCleaner,
 	page = 1,
 	totalCount,
 	pageSize = 20,
@@ -142,13 +144,23 @@ export function PropertiesTable({
 								<p>{DICT.COMMON.ACTIONS.SET_PRICE}</p>
 							</TooltipContent>
 						</Tooltip>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<Button variant="secondary" size="icon-sm" onClick={() => onAssignCleaner?.(item)}>
+									<UserCheck className="size-4" />
+								</Button>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>{DICT.ADMIN.PROPERTY_ASSIGN_CLEANER.BUTTON_ASSIGN}</p>
+							</TooltipContent>
+						</Tooltip>
 					</div>
 				),
 			},
 		];
 
 		return cols;
-	}, [onView, onEditPrice]);
+	}, [onView, onEditPrice, onAssignCleaner]);
 
 	const renderMobileHeader = useMemo(
 		() => (property: Property) => (
@@ -189,10 +201,23 @@ export function PropertiesTable({
 							<p>{DICT.COMMON.ACTIONS.VIEW_DETAILS}</p>
 						</TooltipContent>
 					</Tooltip>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button
+								variant="secondary"
+								size="icon-sm"
+								onClick={() => onAssignCleaner?.(property)}>
+								<UserCheck className="size-4" />
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>{DICT.ADMIN.PROPERTY_ASSIGN_CLEANER.BUTTON_ASSIGN}</p>
+						</TooltipContent>
+					</Tooltip>
 				</div>
 			</div>
 		),
-		[onView, onEditPrice],
+		[onView, onEditPrice, onAssignCleaner],
 	);
 
 	const priorityColumns = ['address_line_1', 'postcode', 'town_city', 'actions'];

@@ -409,6 +409,7 @@ export type Database = {
 					extra_images_urls: string[] | null;
 					host_id: string;
 					id: string;
+					main_cleaner_id: string | null;
 					main_image_url: string;
 					postcode: string;
 					price_per_cleaning: number | null;
@@ -427,6 +428,7 @@ export type Database = {
 					extra_images_urls?: string[] | null;
 					host_id: string;
 					id?: string;
+					main_cleaner_id?: string | null;
 					main_image_url: string;
 					postcode: string;
 					price_per_cleaning?: number | null;
@@ -445,6 +447,7 @@ export type Database = {
 					extra_images_urls?: string[] | null;
 					host_id?: string;
 					id?: string;
+					main_cleaner_id?: string | null;
 					main_image_url?: string;
 					postcode?: string;
 					price_per_cleaning?: number | null;
@@ -463,6 +466,20 @@ export type Database = {
 					{
 						foreignKeyName: 'properties_host_id_fkey';
 						columns: ['host_id'];
+						isOneToOne: false;
+						referencedRelation: 'profiles_public';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'properties_main_cleaner_id_fkey';
+						columns: ['main_cleaner_id'];
+						isOneToOne: false;
+						referencedRelation: 'profiles';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'properties_main_cleaner_id_fkey';
+						columns: ['main_cleaner_id'];
 						isOneToOne: false;
 						referencedRelation: 'profiles_public';
 						referencedColumns: ['id'];
@@ -840,6 +857,10 @@ export type Database = {
 			admin_get_users_count: {
 				Args: { p_role?: string; p_search?: string };
 				Returns: number;
+			};
+			admin_set_property_main_cleaner: {
+				Args: { p_cleaner_id?: string; p_property_id: string };
+				Returns: undefined;
 			};
 			admin_unassign_cleaner: {
 				Args: { p_cleaning_id: string };

@@ -82,6 +82,22 @@ export const cleaningService = {
 		return { data: undefined, error: null };
 	},
 
+	async setPropertyMainCleaner(
+		propertyId: string,
+		cleanerId: string | null,
+	): Promise<ActionResult<void>> {
+		const { error } = await supabase.rpc('admin_set_property_main_cleaner', {
+			p_property_id: propertyId,
+			p_cleaner_id: cleanerId ?? undefined,
+		});
+
+		if (error) {
+			return { data: null, error: mapDatabaseError(error) };
+		}
+
+		return { data: undefined, error: null };
+	},
+
 	async createCleaningForHost(
 		hostId: string,
 		propertyId: string,

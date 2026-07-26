@@ -18,6 +18,7 @@ import {
 import { FormContainer } from '@/components/ui/form-container';
 import { Label } from '@/components/ui/label';
 import { DICT } from '@/dictionary';
+import { AssignPropertyCleanerDialog } from '@/features/admin/components/AssignPropertyCleanerDialog';
 import { CleaningsTable } from '@/features/admin/components/CleaningsTable';
 import { PropertiesTable } from '@/features/admin/components/PropertiesTable';
 import { PropertyPriceDialog } from '@/features/admin/components/PropertyPriceDialog';
@@ -41,6 +42,7 @@ export function AdminHostDetailPage() {
 	const navigate = useNavigate();
 	const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 	const [pricingProperty, setPricingProperty] = useState<Property | null>(null);
+	const [assignCleanerProperty, setAssignCleanerProperty] = useState<Property | null>(null);
 	const [propertiesSortField, setPropertiesSortField] = useState<string>('address_line_1');
 	const [propertiesSortDirection, setPropertiesSortDirection] = useState<'asc' | 'desc'>('desc');
 	const [cleaningsSortField, setCleaningsSortField] = useState<string>('date');
@@ -336,6 +338,7 @@ export function AdminHostDetailPage() {
 							emptyMessage={dict.EMPTY_PROPERTIES}
 							onView={(id) => propertyModal.openView(id)}
 							onEditPrice={(property) => setPricingProperty(property)}
+							onAssignCleaner={(property) => setAssignCleanerProperty(property)}
 							pageSize={10}
 							totalCount={properties.length}
 							sortField={propertiesSortField}
@@ -490,6 +493,39 @@ export function AdminHostDetailPage() {
 						null
 					}
 					onSuccess={refresh}
+				/>
+			)}
+
+			{assignCleanerProperty && (
+				<AssignPropertyCleanerDialog
+					open={true}
+					onOpenChange={(open) => {
+						if (!open) {
+							setAssignCleanerProperty(null);
+						}
+					}}
+					propertyAddress={`${assignCleanerProperty.address_line_1 ?? ''}, ${assignCleanerProperty.postcode ?? ''}`}
+					currentCleanerId={
+						(assignCleanerProperty as { main_cleaner_id?: string | null }).main_cleaner_id ?? null
+					}
+					availableCleaners={availableCleaners}
+					onSave={async (cleanerId) => {
+						const result = await adminCleaningService.setPropertyMainCleaner(
+							assignCleanerProperty.id,
+							cleanerId,
+						);
+						if (result.error) {
+							toast.error(result.error);
+						} else {
+							toast.success(
+								cleanerId
+									? DICT.ADMIN.PROPERTY_ASSIGN_CLEANER.TOAST_SUCCESS
+									: DICT.ADMIN.PROPERTY_ASSIGN_CLEANER.TOAST_CLEARED,
+							);
+							setAssignCleanerProperty(null);
+							refresh();
+						}
+					}}
 				/>
 			)}
 		</UserDetailLayout>
