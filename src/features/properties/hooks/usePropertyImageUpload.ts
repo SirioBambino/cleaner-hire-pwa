@@ -10,7 +10,7 @@ const EXTRA_IMAGES_LIMIT = 10;
 
 export function usePropertyImageUpload(initialData?: Property) {
 	const [mainImage, setMainImage] = useState<File[] | null>(null);
-	const [extraImages, setExtraImages] = useState<File[] | null>([]);
+	const [extraImages, setExtraImages] = useState<File[] | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
 	const [extraImagesPaths, setExtraImagesPaths] = useState<string[]>(
 		initialData?.extra_images_urls || [],

@@ -171,9 +171,11 @@ export function DateTimePicker({ value, onChange, error }: DateTimePickerProps) 
 	const [isOpen, setIsOpen] = React.useState(false);
 	const isMobile = useIsMobile();
 
+	const roundedValue = React.useMemo(() => (value ? roundUpTo5Minutes(value) : undefined), [value]);
+
 	const handleDateSelect = (date: Date | undefined) => {
 		if (date) {
-			const current = value || roundUpTo5Minutes(new Date());
+			const current = roundedValue || roundUpTo5Minutes(new Date());
 			const newDate = new Date(date);
 			newDate.setHours(current.getHours());
 			newDate.setMinutes(current.getMinutes());
@@ -181,7 +183,9 @@ export function DateTimePicker({ value, onChange, error }: DateTimePickerProps) 
 		}
 	};
 
-	const displayValue = value ? format(value, 'dd/MM/yyyy hh:mm aa') : 'Select date and time';
+	const displayValue = roundedValue
+		? format(roundedValue, 'dd/MM/yyyy hh:mm aa')
+		: 'Select date and time';
 
 	const TriggerButton = (
 		<Button
@@ -213,7 +217,7 @@ export function DateTimePicker({ value, onChange, error }: DateTimePickerProps) 
 					className="p-0"
 				/>
 			</div>
-			<TimePicker value={value || new Date()} onChange={onChange} />
+			<TimePicker value={roundedValue || new Date()} onChange={onChange} />
 		</div>
 	);
 
