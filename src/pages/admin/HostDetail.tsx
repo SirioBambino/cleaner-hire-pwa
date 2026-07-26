@@ -50,6 +50,9 @@ export function AdminHostDetailPage() {
 	const [cleaningsUpcomingFilter, setCleaningsUpcomingFilter] = useState(false);
 	const [deletePropertyId, setDeletePropertyId] = useState<string | null>(null);
 	const [editingProperty, setEditingProperty] = useState<Property | null>(null);
+	const [pendingCleaningValues, setPendingCleaningValues] = useState<CleaningFormValues | null>(
+		null,
+	);
 
 	const { host, loading, refresh } = useHostDetail(id, {
 		propertiesSortField,
@@ -133,27 +136,46 @@ export function AdminHostDetailPage() {
 		return { error: null };
 	}, [host, navigate]);
 
+	const executeCreateCleaning = useCallback(
+		async (values: CleaningFormValues) => {
+			if (!id) {
+				return;
+			}
+			const result = await adminCleaningService.createCleaningForHost(
+				id,
+				values.property_id,
+				values.scheduled_start.toISOString(),
+				{
+					information: values.information || undefined,
+					stocksIncluded: values.stocks_included,
+					customTasks: values.custom_tasks?.map((t) => t.description) || [],
+				},
+			);
+			if (result.error) {
+				toast.error(result.error);
+			} else {
+				toast.success(DICT.CLEANINGS.CREATE.TOAST_SUCCESS);
+				setIsCreateModalOpen(false);
+				await Promise.all([refresh(), fetchCleanings()]);
+			}
+		},
+		[id, refresh, fetchCleanings],
+	);
+
 	const handleCreateCleaning = async (values: CleaningFormValues) => {
 		if (!id) {
 			return;
 		}
-		const result = await adminCleaningService.createCleaningForHost(
-			id,
+		const checkDate = values.scheduled_start.toISOString().slice(0, 10);
+		const { data: conflicts } = await adminCleaningService.checkPropertyCleaningConflict(
 			values.property_id,
-			values.scheduled_start.toISOString(),
-			{
-				information: values.information || undefined,
-				stocksIncluded: values.stocks_included,
-				customTasks: values.custom_tasks?.map((t) => t.description) || [],
-			},
+			checkDate,
 		);
-		if (result.error) {
-			toast.error(result.error);
-		} else {
-			toast.success(DICT.CLEANINGS.CREATE.TOAST_SUCCESS);
-			setIsCreateModalOpen(false);
-			await Promise.all([refresh(), fetchCleanings()]);
+		if (conflicts && conflicts.length > 0) {
+			setPendingCleaningValues(values);
+			return;
 		}
+		await executeCreateCleaning(values);
 	};
 
 	const fetchCleaningById = useCallback(async (cleaningId: string) => {
@@ -524,6 +546,29 @@ export function AdminHostDetailPage() {
 							);
 							setAssignCleanerProperty(null);
 							refresh();
+						}
+					}}
+				/>
+			)}
+
+			{pendingCleaningValues && (
+				<ConfirmActionDialog
+					open={true}
+					onOpenChange={(open) => {
+						if (!open) {
+							setPendingCleaningValues(null);
+						}
+					}}
+					title={DICT.CLEANINGS.CONFLICT.TITLE}
+					description={DICT.CLEANINGS.CONFLICT.DESCRIPTION.replace(
+						'{date}',
+						pendingCleaningValues.scheduled_start.toLocaleDateString(),
+					)}
+					confirmText={DICT.CLEANINGS.CONFLICT.CONFIRM}
+					onConfirm={async () => {
+						if (pendingCleaningValues) {
+							await executeCreateCleaning(pendingCleaningValues);
+							setPendingCleaningValues(null);
 						}
 					}}
 				/>

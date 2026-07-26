@@ -394,6 +394,13 @@ export const DICT = {
 			TOAST_SUCCESS: 'Cleaning request updated successfully',
 			TOAST_ERROR: 'Failed to load cleaning for editing',
 		},
+		CONFLICT: {
+			TITLE: 'Cleaning Already Exists',
+			DESCRIPTION:
+				'A cleaning for this property already exists on {date}. Do you want to create another one?',
+			CONFIRM: 'Create Anyway',
+			CANCEL: 'Go Back',
+		},
 		DELETE: {
 			MESSAGE: "This will permanently cancel the cleaning and you won't be charged.",
 			TITLE: 'Cancel cleaning request?',

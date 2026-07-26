@@ -1,6 +1,7 @@
 'use client';
 
 import { CalendarX, Plus } from 'lucide-react';
+import { ConfirmActionDialog } from '@/components/ConfirmActionDialog';
 import { Button } from '@/components/ui/button';
 import { DICT } from '@/dictionary';
 import { CleaningDetailView } from '@/features/cleanings/components/CleaningDetailView';
@@ -18,66 +19,89 @@ export function HostCleaningsPage() {
 		modal,
 		handleUpsert,
 		handleDelete,
+		pendingFormValues,
+		confirmCreate,
+		cancelCreate,
 	} = useHostCleanings();
 
 	return (
-		<ManagementLayout
-			title={DICT.CLEANINGS.TITLE}
-			headerActions={
-				<Button onClick={modal.openCreate}>
-					<Plus className="size-5" />
-					<span>{DICT.CLEANINGS.NEW}</span>
-				</Button>
-			}
-			isLoading={isLoading}
-			hasResources={cleanings.length > 0}
-			emptyState={
-				<div className="flex flex-col items-center justify-center min-h-100 border-2 border-dashed rounded-xl p-8 text-center">
-					<div className="bg-muted rounded-full p-4 mb-4">
-						<CalendarX className="size-8 text-muted-foreground" />
+		<>
+			<ManagementLayout
+				title={DICT.CLEANINGS.TITLE}
+				headerActions={
+					<Button onClick={modal.openCreate}>
+						<Plus className="size-5" />
+						<span>{DICT.CLEANINGS.NEW}</span>
+					</Button>
+				}
+				isLoading={isLoading}
+				hasResources={cleanings.length > 0}
+				emptyState={
+					<div className="flex flex-col items-center justify-center min-h-100 border-2 border-dashed rounded-xl p-8 text-center">
+						<div className="bg-muted rounded-full p-4 mb-4">
+							<CalendarX className="size-8 text-muted-foreground" />
+						</div>
+						<h3 className="text-lg font-semibold">{DICT.CLEANINGS.EMPTY.MESSAGE_HOST}</h3>
 					</div>
-					<h3 className="text-lg font-semibold">{DICT.CLEANINGS.EMPTY.MESSAGE_HOST}</h3>
-				</div>
-			}
-			grid={
-				<CleaningGrid
-					onView={modal.openView}
-					onEdit={modal.openEdit}
-					onDelete={modal.setDeletingId}
-					userRole="host"
-				/>
-			}
-			isViewOpen={modal.isViewOpen}
-			isEditOrCreateOpen={modal.isEditOrCreateOpen}
-			onClose={modal.handleClose}
-			viewContent={
-				viewingCleaning ? (
-					<CleaningDetailView
-						cleaning={viewingCleaning}
-						userRole="host"
+				}
+				grid={
+					<CleaningGrid
+						onView={modal.openView}
 						onEdit={modal.openEdit}
 						onDelete={modal.setDeletingId}
+						userRole="host"
 					/>
-				) : (
-					<div className="p-6 text-center text-muted-foreground">{DICT.CLEANINGS.NOT_FOUND}</div>
-				)
-			}
-			formTitle={editingCleaning ? DICT.CLEANINGS.EDIT.TITLE : DICT.CLEANINGS.CREATE.TITLE}
-			formDescription={
-				editingCleaning ? DICT.CLEANINGS.EDIT.MESSAGE : DICT.CLEANINGS.CREATE.MESSAGE
-			}
-			formContent={
-				<CleaningForm
-					initialData={editingCleaning}
-					onSubmit={handleUpsert}
-					onCancel={modal.handleClose}
+				}
+				isViewOpen={modal.isViewOpen}
+				isEditOrCreateOpen={modal.isEditOrCreateOpen}
+				onClose={modal.handleClose}
+				viewContent={
+					viewingCleaning ? (
+						<CleaningDetailView
+							cleaning={viewingCleaning}
+							userRole="host"
+							onEdit={modal.openEdit}
+							onDelete={modal.setDeletingId}
+						/>
+					) : (
+						<div className="p-6 text-center text-muted-foreground">{DICT.CLEANINGS.NOT_FOUND}</div>
+					)
+				}
+				formTitle={editingCleaning ? DICT.CLEANINGS.EDIT.TITLE : DICT.CLEANINGS.CREATE.TITLE}
+				formDescription={
+					editingCleaning ? DICT.CLEANINGS.EDIT.MESSAGE : DICT.CLEANINGS.CREATE.MESSAGE
+				}
+				formContent={
+					<CleaningForm
+						initialData={editingCleaning}
+						onSubmit={handleUpsert}
+						onCancel={modal.handleClose}
+					/>
+				}
+				deletingId={modal.deletingId}
+				onDeleteCancel={() => modal.setDeletingId(null)}
+				onDeleteConfirm={handleDelete}
+				deleteTitle={DICT.CLEANINGS.DELETE.TITLE}
+				deleteMessage={DICT.CLEANINGS.DELETE.MESSAGE}
+			/>
+
+			{pendingFormValues && (
+				<ConfirmActionDialog
+					open={true}
+					onOpenChange={(open) => {
+						if (!open) {
+							cancelCreate();
+						}
+					}}
+					title={DICT.CLEANINGS.CONFLICT.TITLE}
+					description={DICT.CLEANINGS.CONFLICT.DESCRIPTION.replace(
+						'{date}',
+						new Date(pendingFormValues.scheduled_start).toLocaleDateString(),
+					)}
+					confirmText={DICT.CLEANINGS.CONFLICT.CONFIRM}
+					onConfirm={confirmCreate}
 				/>
-			}
-			deletingId={modal.deletingId}
-			onDeleteCancel={() => modal.setDeletingId(null)}
-			onDeleteConfirm={handleDelete}
-			deleteTitle={DICT.CLEANINGS.DELETE.TITLE}
-			deleteMessage={DICT.CLEANINGS.DELETE.MESSAGE}
-		/>
+			)}
+		</>
 	);
 }
