@@ -64,8 +64,8 @@ export function getBucketConfig(bucketName: string): BucketConfig {
 }
 
 export function getMimeType(fileName: string): string {
-	const lastDotIndex = fileName.lastIndexOf('.');
-	const ext = lastDotIndex !== -1 ? fileName.slice(lastDotIndex + 1).toLowerCase() : '';
+	const match = fileName.match(/\.(\w+)(?:$|[?#])/);
+	const ext = match?.[1]?.toLowerCase() ?? '';
 	return EXTENSION_MIME_MAP[ext] ?? 'application/octet-stream';
 }
 
