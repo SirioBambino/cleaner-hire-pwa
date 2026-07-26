@@ -403,6 +403,7 @@ export type Database = {
 					address_line_2: string | null;
 					bathrooms: number;
 					bedrooms: number;
+					cleaner_pay_override: number | null;
 					created_at: string;
 					deleted_at: string | null;
 					extra_images_urls: string[] | null;
@@ -420,6 +421,7 @@ export type Database = {
 					address_line_2?: string | null;
 					bathrooms?: number;
 					bedrooms?: number;
+					cleaner_pay_override?: number | null;
 					created_at?: string;
 					deleted_at?: string | null;
 					extra_images_urls?: string[] | null;
@@ -437,6 +439,7 @@ export type Database = {
 					address_line_2?: string | null;
 					bathrooms?: number;
 					bedrooms?: number;
+					cleaner_pay_override?: number | null;
 					created_at?: string;
 					deleted_at?: string | null;
 					extra_images_urls?: string[] | null;
@@ -588,6 +591,7 @@ export type Database = {
 					p_sort_direction?: string;
 					p_sort_field?: string;
 					p_status?: string;
+					p_unassigned?: boolean;
 					p_upcoming?: boolean;
 				};
 				Returns: {
@@ -681,6 +685,7 @@ export type Database = {
 					p_host_id?: string;
 					p_search?: string;
 					p_status?: string;
+					p_unassigned?: boolean;
 					p_upcoming?: boolean;
 				};
 				Returns: number;
@@ -853,7 +858,11 @@ export type Database = {
 				Returns: string;
 			};
 			admin_update_property_price: {
-				Args: { p_price: number; p_property_id: string };
+				Args: {
+					p_cleaner_pay_override?: number;
+					p_price: number;
+					p_property_id: string;
+				};
 				Returns: undefined;
 			};
 			admin_update_standard_tasks: {

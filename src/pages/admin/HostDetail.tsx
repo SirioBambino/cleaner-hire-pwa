@@ -485,6 +485,10 @@ export function AdminHostDetailPage() {
 					propertyId={pricingProperty.id}
 					propertyAddress={`${pricingProperty.address_line_1 ?? ''}, ${pricingProperty.postcode ?? ''}`}
 					currentPrice={pricingProperty.price_per_cleaning ?? null}
+					currentCleanerPay={
+						(pricingProperty as { cleaner_pay_override?: number | null }).cleaner_pay_override ??
+						null
+					}
 					onSuccess={refresh}
 				/>
 			)}

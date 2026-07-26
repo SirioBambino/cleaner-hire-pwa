@@ -22,7 +22,7 @@ export const cleaningService = {
 			p_host_id: (hostId ?? null) as string,
 			p_search: (search ?? null) as string,
 			p_upcoming: upcoming ?? undefined,
-			p_unassigned: isUnassigned ? true : null,
+			p_unassigned: isUnassigned ? true : undefined,
 			p_page: page,
 			p_limit: limit,
 			p_sort_field: (sortField ?? null) as string,
@@ -47,7 +47,7 @@ export const cleaningService = {
 			p_host_id: (hostId ?? null) as string,
 			p_search: (search ?? null) as string,
 			p_upcoming: upcoming ?? undefined,
-			p_unassigned: isUnassigned ? true : null,
+			p_unassigned: isUnassigned ? true : undefined,
 		});
 
 		if (error) {
