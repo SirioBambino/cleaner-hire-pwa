@@ -31,20 +31,25 @@ import { formatPostcode } from '@/lib/utils';
 
 const POSTCODE_REGEX = /^[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}$/i;
 
-const propertySchema = z.object({
-	address_line_1: z.string().min(1, DICT.COMMON.VALIDATION.ADDRESS_REQUIRED),
-	address_line_2: z.string().optional(),
-	town_city: z.string().min(1, DICT.COMMON.VALIDATION.TOWN_REQUIRED),
-	postcode: z
-		.string()
-		.regex(POSTCODE_REGEX, DICT.COMMON.VALIDATION.POSTCODE_INVALID)
-		.transform((val) => formatPostcode(val.replace(/\s+/g, ''))),
-	type: z.enum(propertyTypeValues),
-	bedrooms: z.coerce.number().min(0, DICT.COMMON.VALIDATION.NUMBER_INVALID),
-	bathrooms: z.coerce.number().min(0, DICT.COMMON.VALIDATION.NUMBER_INVALID),
-	main_image_url: z.string().optional(),
-	has_main_image: z.boolean().optional(),
-});
+const propertySchema = z
+	.object({
+		address_line_1: z.string().min(1, DICT.COMMON.VALIDATION.ADDRESS_REQUIRED),
+		address_line_2: z.string().optional(),
+		town_city: z.string().min(1, DICT.COMMON.VALIDATION.TOWN_REQUIRED),
+		postcode: z
+			.string()
+			.regex(POSTCODE_REGEX, DICT.COMMON.VALIDATION.POSTCODE_INVALID)
+			.transform((val) => formatPostcode(val.replace(/\s+/g, ''))),
+		type: z.enum(propertyTypeValues),
+		bedrooms: z.coerce.number().min(0, DICT.COMMON.VALIDATION.NUMBER_INVALID),
+		bathrooms: z.coerce.number().min(0, DICT.COMMON.VALIDATION.NUMBER_INVALID),
+		main_image_url: z.string().optional(),
+		has_main_image: z.boolean().optional(),
+	})
+	.refine((data) => data.has_main_image, {
+		message: DICT.COMMON.VALIDATION.IMAGE_REQUIRED,
+		path: ['has_main_image'],
+	});
 
 export type PropertyFormValues = z.infer<typeof propertySchema>;
 
@@ -242,9 +247,11 @@ export function PropertyForm({
 					<FieldLabel>{DICT.COMMON.IMAGES.MAIN}</FieldLabel>
 					<FileUploader
 						value={mainImage}
-						onValueChange={setMainImage}
-						existingImages={initialData?.main_image_url ? [initialData.main_image_url] : []}
-						onRemoveExisting={() => setMainImage(null)}
+						onValueChange={(files) => setMainImage(files?.length ? files : null)}
+						existingImages={
+							!mainImage && initialData?.main_image_url ? [initialData.main_image_url] : []
+						}
+						bucket="property-media"
 						dropzoneOptions={{
 							maxFiles: 1,
 							maxSize: bucketConfig.maxSize,
@@ -278,6 +285,7 @@ export function PropertyForm({
 						onValueChange={(files) => setExtraImages(files || [])}
 						existingImages={extraImagesPaths}
 						onRemoveExisting={removeExistingImage}
+						bucket="property-media"
 						dropzoneOptions={{
 							maxFiles: remainingSlots,
 							maxSize: bucketConfig.maxSize,
