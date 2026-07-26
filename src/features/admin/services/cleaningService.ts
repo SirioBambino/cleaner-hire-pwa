@@ -82,6 +82,22 @@ export const cleaningService = {
 		return { data: undefined, error: null };
 	},
 
+	async checkPropertyCleaningConflict(
+		propertyId: string,
+		date: string,
+	): Promise<ActionResult<{ id: string; status: string }[]>> {
+		const { data, error } = await supabase.rpc('check_property_cleaning_on_date', {
+			p_property_id: propertyId,
+			p_check_date: date,
+		});
+
+		if (error) {
+			return { data: null, error: mapDatabaseError(error) };
+		}
+
+		return { data: data as { id: string; status: string }[], error: null };
+	},
+
 	async setPropertyMainCleaner(
 		propertyId: string,
 		cleanerId: string | null,

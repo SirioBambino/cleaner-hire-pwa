@@ -122,6 +122,22 @@ export const cleaningRequestService = {
 		return { data: transformed, error: null };
 	},
 
+	async checkPropertyCleaningConflict(
+		propertyId: string,
+		date: string,
+	): Promise<ActionResult<{ id: string; status: string }[]>> {
+		const { data, error } = await supabase.rpc('check_property_cleaning_on_date', {
+			p_property_id: propertyId,
+			p_check_date: date,
+		});
+
+		if (error) {
+			return { data: null, error: mapDatabaseError(error) };
+		}
+
+		return { data: data as { id: string; status: string }[], error: null };
+	},
+
 	async createCleaningRequest(
 		payload: CreateCleaningRequestPayload,
 	): Promise<ActionResult<CleaningRequest>> {

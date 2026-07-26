@@ -1,6 +1,6 @@
 'use client';
 
-import { Banknote, Eye, UserCheck } from 'lucide-react';
+import { Banknote, Eye, UserStar } from 'lucide-react';
 import { useMemo } from 'react';
 import { DataTable } from '@/components/DataTable';
 import { Button } from '@/components/ui/button';
@@ -147,7 +147,7 @@ export function PropertiesTable({
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<Button variant="secondary" size="icon-sm" onClick={() => onAssignCleaner?.(item)}>
-									<UserCheck className="size-4" />
+									<UserStar className="size-4" />
 								</Button>
 							</TooltipTrigger>
 							<TooltipContent>
@@ -207,7 +207,7 @@ export function PropertiesTable({
 								variant="secondary"
 								size="icon-sm"
 								onClick={() => onAssignCleaner?.(property)}>
-								<UserCheck className="size-4" />
+								<UserStar className="size-4" />
 							</Button>
 						</TooltipTrigger>
 						<TooltipContent>

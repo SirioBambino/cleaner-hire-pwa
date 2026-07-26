@@ -890,6 +890,13 @@ export type Database = {
 				Args: { p_tasks: Json; p_tasks_to_delete: string[] };
 				Returns: undefined;
 			};
+			check_property_cleaning_on_date: {
+				Args: { p_check_date: string; p_property_id: string };
+				Returns: {
+					id: string;
+					status: string;
+				}[];
+			};
 			cleanup_unconfirmed_users: {
 				Args: { days_threshold?: number };
 				Returns: number;
