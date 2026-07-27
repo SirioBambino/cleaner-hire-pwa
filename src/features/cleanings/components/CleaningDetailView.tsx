@@ -62,12 +62,42 @@ export function CleaningDetailView({
 	});
 
 	const { config: cleanerPayConfig } = useCleanerPayConfig();
-	const hourlyRate = !isHost ? (cleanerPayConfig?.hourly_rate ?? null) : null;
 
-	const estimatedHours =
-		cleaning.cleaner_pay != null && hourlyRate != null && hourlyRate > 0
-			? cleaning.cleaner_pay / hourlyRate
-			: null;
+	const estimatedHours = useMemo(() => {
+		if (!cleanerPayConfig || !cleaning.property) {
+			return null;
+		}
+
+		const { type, bedrooms, bathrooms } = cleaning.property;
+		const { target_times, bathroom_time } = cleanerPayConfig;
+
+		let targetHours: number | null = null;
+
+		if (type === 'studio') {
+			targetHours = target_times.studio;
+		} else if (bedrooms != null) {
+			const key = `${bedrooms}_bed` as keyof typeof target_times;
+			targetHours = target_times[key] ?? null;
+
+			if (targetHours == null) {
+				const bedroomKeys = (Object.keys(target_times) as (keyof typeof target_times)[])
+					.filter((k) => k.endsWith('_bed'))
+					.map((k) => ({ key: k, num: Number.parseInt(k.split('_')[0] ?? '0', 10) }))
+					.sort((a, b) => b.num - a.num);
+				const bestMatch = bedroomKeys[0];
+				if (bestMatch) {
+					targetHours = target_times[bestMatch.key];
+				}
+			}
+		}
+
+		if (targetHours == null) {
+			return null;
+		}
+
+		const bathroomBonus = Math.max(0, (bathrooms ?? 0) - 1) * (bathroom_time ?? 0.5);
+		return targetHours + bathroomBonus;
+	}, [cleanerPayConfig, cleaning.property]);
 
 	const {
 		showEvidenceForm,
