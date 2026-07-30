@@ -23,7 +23,7 @@ interface VerifyOtpFormProps {
 
 export function VerifyOtpForm({ email, onBackToSignup }: VerifyOtpFormProps) {
 	const navigate = useNavigate();
-	const [resendCooldown, setResendCooldown] = useState(0);
+	const [resendCooldown, setResendCooldown] = useState(60);
 
 	const otpForm = useForm<{ token: string }>({
 		resolver: zodResolver(otpSchema),

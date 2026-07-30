@@ -146,8 +146,7 @@ export const authService = {
 			},
 		});
 
-		void error;
-		return { error: null };
+		return { error: error ? mapAuthError(error) : null };
 	},
 
 	async resetPassword(email: string): Promise<{ error: string | null }> {
