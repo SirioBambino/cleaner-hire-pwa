@@ -2,6 +2,8 @@ import { Component, type ErrorInfo, type ReactNode, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DICT } from '@/dictionary';
 
+const CHUNK_RECOVERY_KEY = 'sw:recovering_chunk';
+
 interface ErrorDisplayProps {
 	title?: string;
 	message?: string;
@@ -52,6 +54,17 @@ interface ErrorBoundaryState {
 	hasError: boolean;
 }
 
+function isChunkLoadError(error: Error): boolean {
+	const message = error.message.toLowerCase();
+	return (
+		message.includes('text/html') ||
+		message.includes('loading chunk') ||
+		error.name === 'ChunkLoadError' ||
+		message.includes('dynamically imported') ||
+		message.includes('failed to fetch dynamically imported module')
+	);
+}
+
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 	constructor(props: ErrorBoundaryProps) {
 		super(props);
@@ -65,6 +78,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 	componentDidCatch(error: Error, info: ErrorInfo) {
 		if (import.meta.env.DEV) {
 			console.error('ErrorBoundary caught an error:', error, info);
+		}
+
+		if (isChunkLoadError(error)) {
+			const alreadyRecovering = sessionStorage.getItem(CHUNK_RECOVERY_KEY) === 'true';
+			if (!alreadyRecovering) {
+				sessionStorage.setItem(CHUNK_RECOVERY_KEY, 'true');
+				window.location.reload();
+			}
 		}
 	}
 
