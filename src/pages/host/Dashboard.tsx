@@ -1,6 +1,6 @@
 'use client';
 
-import { BrushCleaning, Calendar, ClipboardList, Home, Zap } from 'lucide-react';
+import { Banknote, BrushCleaning, Calendar, ClipboardList, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { DICT } from '@/dictionary';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
@@ -35,9 +35,9 @@ export function HostDashboardPage() {
 			iconColor: 'text-warning',
 		},
 		{
-			label: dict.STATS.PROPERTIES,
-			value: stats?.totalProperties ?? 0,
-			icon: Home,
+			label: dict.STATS.TOTAL_COSTS,
+			value: stats?.totalCosts !== undefined ? `£${stats.totalCosts.toFixed(2)}` : '£0.00',
+			icon: Banknote,
 			iconColor: 'text-[color-mix(in_oklch,var(--color-primary),var(--color-destructive))]',
 		},
 	];

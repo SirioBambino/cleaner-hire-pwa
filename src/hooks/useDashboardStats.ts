@@ -15,6 +15,7 @@ export interface DashboardStats {
 	upcoming?: number;
 	requested?: number;
 	inProgress?: number;
+	totalCosts?: number;
 	// Cleaner
 	assigned?: number;
 	active?: number;
@@ -26,7 +27,7 @@ export function useDashboardStats(): { stats: DashboardStats | null; isLoading: 
 	const { profile } = useAuth();
 	const role = profile?.role;
 	const { cleanings, isLoading: cleaningsLoading } = useCleanings();
-	const { properties, isLoading: propertiesLoading } = useProperties();
+	const { isLoading: propertiesLoading } = useProperties();
 
 	const [adminStats, setAdminStats] = useState<DashboardStats | null>(null);
 	const [adminLoading, setAdminLoading] = useState(true);
@@ -68,9 +69,9 @@ export function useDashboardStats(): { stats: DashboardStats | null; isLoading: 
 			).length,
 			inProgress: cleanings.filter((c) => c.status === CLEANING_STATUS.IN_PROGRESS).length,
 			requested: cleanings.filter((c) => c.status === CLEANING_STATUS.REQUESTED).length,
-			totalProperties: properties.length,
+			totalCosts: cleanings.reduce((sum, c) => sum + (c.service_cost ?? 0), 0),
 		};
-	}, [cleanings, properties, role]);
+	}, [cleanings, role]);
 
 	const cleanerStats = useMemo((): DashboardStats | null => {
 		if (role !== 'cleaner') {
