@@ -38,7 +38,7 @@ describe('Host Dashboard', () => {
 		expect(await screen.findByText(dict.CONFIRMED)).toBeInTheDocument();
 		expect(screen.getByText(dict.IN_PROGRESS)).toBeInTheDocument();
 		expect(screen.getByText(dict.REQUESTED)).toBeInTheDocument();
-		expect(screen.getByText(dict.PROPERTIES)).toBeInTheDocument();
+		expect(screen.getByText(dict.TOTAL_COSTS)).toBeInTheDocument();
 	});
 
 	it('shows CTA card with request cleaning button', async () => {

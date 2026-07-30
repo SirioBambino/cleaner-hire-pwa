@@ -33,7 +33,7 @@ test('PWA meets modern installability criteria', async ({ page }) => {
 test('Service Worker handles offline requests', async ({ browser, browserName }) => {
 	test.skip(browserName === 'webkit', 'Offline emulation is unstable in WebKit');
 
-	// Global config blocks SWs; allow them only for this test
+	// Global config blocks SWs allow them only for this test
 	const context = await browser.newContext({ serviceWorkers: 'allow' });
 	const page = await context.newPage();
 
