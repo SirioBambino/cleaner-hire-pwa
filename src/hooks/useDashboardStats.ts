@@ -69,7 +69,15 @@ export function useDashboardStats(): { stats: DashboardStats | null; isLoading: 
 			).length,
 			inProgress: cleanings.filter((c) => c.status === CLEANING_STATUS.IN_PROGRESS).length,
 			requested: cleanings.filter((c) => c.status === CLEANING_STATUS.REQUESTED).length,
-			totalCosts: cleanings.reduce((sum, c) => sum + (c.service_cost ?? 0), 0),
+			totalCosts: cleanings
+				.filter((c) => {
+					const scheduled = new Date(c.scheduled_start);
+					const now = new Date();
+					return (
+						scheduled.getMonth() === now.getMonth() && scheduled.getFullYear() === now.getFullYear()
+					);
+				})
+				.reduce((sum, c) => sum + (c.service_cost ?? 0), 0),
 		};
 	}, [cleanings, role]);
 

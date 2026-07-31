@@ -35,7 +35,10 @@ export function HostDashboardPage() {
 			iconColor: 'text-warning',
 		},
 		{
-			label: dict.STATS.TOTAL_COSTS,
+			label: dict.STATS.TOTAL_COSTS.replace(
+				'{month}',
+				new Date().toLocaleDateString('en-GB', { month: 'long' }),
+			),
 			value: stats?.totalCosts !== undefined ? `£${stats.totalCosts.toFixed(2)}` : '£0.00',
 			icon: Banknote,
 			iconColor: 'text-[color-mix(in_oklch,var(--color-primary),var(--color-destructive))]',

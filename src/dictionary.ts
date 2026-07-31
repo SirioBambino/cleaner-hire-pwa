@@ -251,7 +251,7 @@ export const DICT = {
 				CONFIRMED: 'Upcoming cleanings',
 				IN_PROGRESS: 'Cleanings in progress',
 				REQUESTED: 'Waiting for confirmation',
-				TOTAL_COSTS: 'Total cleaning costs',
+				TOTAL_COSTS: 'Cleaning costs for {month}',
 			},
 			CTA_CARD: {
 				BUTTON: 'Request Now',

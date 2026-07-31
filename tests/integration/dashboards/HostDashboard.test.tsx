@@ -38,7 +38,8 @@ describe('Host Dashboard', () => {
 		expect(await screen.findByText(dict.CONFIRMED)).toBeInTheDocument();
 		expect(screen.getByText(dict.IN_PROGRESS)).toBeInTheDocument();
 		expect(screen.getByText(dict.REQUESTED)).toBeInTheDocument();
-		expect(screen.getByText(dict.TOTAL_COSTS)).toBeInTheDocument();
+		const monthName = new Date().toLocaleDateString('en-GB', { month: 'long' });
+		expect(screen.getByText(dict.TOTAL_COSTS.replace('{month}', monthName))).toBeInTheDocument();
 	});
 
 	it('shows CTA card with request cleaning button', async () => {
