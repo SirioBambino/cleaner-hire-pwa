@@ -773,11 +773,19 @@ export async function setupCleanerMocks(
 ): Promise<MockUser> {
 	const user = buildUser('cleaner');
 	await seedAuthSession(page, user);
-	const defaultProperties = overrides?.properties ?? [buildProperty()];
+	const defaultProperties = overrides?.properties ?? [
+		buildProperty(),
+		buildProperty({
+			id: MOCK_UUIDS.PROPERTY_2,
+			address_line_1: '456 Oak Avenue',
+			type: 'house',
+		}),
+	];
 	const defaultCleanings = overrides?.cleanings ?? [
 		buildCleaning({ cleaner_id: user.id, status: 'confirmed' }),
 		buildCleaning({
 			id: MOCK_UUIDS.CLEANING_2,
+			property_id: MOCK_UUIDS.PROPERTY_2,
 			cleaner_id: user.id,
 			status: 'in_progress',
 			clock_in_time: '2025-07-01T09:00:00Z',

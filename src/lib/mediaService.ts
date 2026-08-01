@@ -77,18 +77,6 @@ export const mediaService = {
 		return supabase.storage.from(bucket).list(folderId);
 	},
 
-	getMediaUrl(path: string | null, _bucket: StorageBucket): string {
-		if (!path || path === 'Placeholder' || path.trim() === '') {
-			return '/placeholder-image.webp';
-		}
-
-		if (path.startsWith('http') || path.startsWith('blob:')) {
-			return path;
-		}
-
-		return '/placeholder-image.webp';
-	},
-
 	async getSignedUrl(
 		path: string,
 		bucket: StorageBucket,

@@ -4,16 +4,18 @@ import { useEffect, useState } from 'react';
 import type { StorageBucket } from '@/lib/mediaService';
 import { mediaService } from '@/lib/mediaService';
 
+const FALLBACK = '/placeholder-image.webp';
+
 export function useMediaUrl(
 	path: string | null | undefined,
 	bucket: StorageBucket,
 	expiresIn = 3600,
 ): string {
-	const [url, setUrl] = useState<string>('/placeholder-image.webp');
+	const [url, setUrl] = useState<string>(FALLBACK);
 
 	useEffect(() => {
 		if (!path || path === 'Placeholder' || path.trim() === '') {
-			setUrl('/placeholder-image.webp');
+			setUrl(FALLBACK);
 			return;
 		}
 
@@ -24,14 +26,20 @@ export function useMediaUrl(
 
 		let cancelled = false;
 
-		mediaService.getSignedUrl(path, bucket, expiresIn).then((signedUrl) => {
+		const refresh = async () => {
+			const signedUrl = await mediaService.getSignedUrl(path, bucket, expiresIn);
 			if (!cancelled) {
-				setUrl(signedUrl ?? '/placeholder-image.webp');
+				setUrl(signedUrl ?? FALLBACK);
 			}
-		});
+		};
+
+		refresh();
+
+		const id = setInterval(refresh, expiresIn * 750);
 
 		return () => {
 			cancelled = true;
+			clearInterval(id);
 		};
 	}, [path, bucket, expiresIn]);
 

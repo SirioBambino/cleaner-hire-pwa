@@ -2,7 +2,7 @@
 
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useSignedUrl } from '@/hooks/useSignedUrl';
+import { useMediaUrl } from '@/hooks/useMediaUrl';
 import { cn } from '@/lib/utils';
 
 interface UserAvatarProps {
@@ -27,13 +27,13 @@ const fontSizeClasses = {
 };
 
 export function UserAvatar({ src, fallbackName, size = 'md', className }: UserAvatarProps) {
-	const signedUrl = useSignedUrl(src, 'avatars');
+	const imageUrl = useMediaUrl(src, 'avatars');
 	const firstChar = fallbackName?.charAt(0) ?? '';
 	const isValidInitial = /^[A-Za-z]$/.test(firstChar);
 
 	return (
 		<Avatar className={cn(sizeClasses[size], className)}>
-			<AvatarImage src={signedUrl ?? undefined} className="object-cover" />
+			{src && <AvatarImage src={imageUrl} className="object-cover" />}
 			<AvatarFallback className={cn(fontSizeClasses[size], 'font-medium bg-muted')}>
 				{isValidInitial ? firstChar.toUpperCase() : <User className="size-1/2" />}
 			</AvatarFallback>

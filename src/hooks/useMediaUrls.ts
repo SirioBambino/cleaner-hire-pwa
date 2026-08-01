@@ -25,7 +25,7 @@ export function useMediaUrls(
 
 		let cancelled = false;
 
-		const resolveUrls = async () => {
+		const refresh = async () => {
 			const results = await Promise.all(
 				validPaths.map(async (p) => {
 					if (p.startsWith('http') || p.startsWith('blob:')) {
@@ -41,10 +41,13 @@ export function useMediaUrls(
 			}
 		};
 
-		resolveUrls();
+		refresh();
+
+		const id = setInterval(refresh, expiresIn * 750);
 
 		return () => {
 			cancelled = true;
+			clearInterval(id);
 		};
 	}, [paths, bucket, expiresIn]);
 
