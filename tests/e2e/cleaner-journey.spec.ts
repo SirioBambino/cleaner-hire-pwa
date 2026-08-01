@@ -106,6 +106,13 @@ test.describe('Cleaner journey', () => {
 			});
 
 			await page
+				.getByRole('checkbox', { name: DICT.CLEANINGS.DETAIL.CHECKBOXES.NO_BROKEN_ITEMS })
+				.click();
+			await page
+				.getByRole('checkbox', { name: DICT.CLEANINGS.DETAIL.CHECKBOXES.NO_LOW_SUPPLIES })
+				.click();
+
+			await page
 				.getByRole('button', { name: DICT.CLEANINGS.DETAIL.COMPLETION.BUTTON_COMPLETE })
 				.click();
 

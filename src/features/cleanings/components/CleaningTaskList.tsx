@@ -3,6 +3,7 @@
 import { CheckCircle2, ListChecks } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { DICT } from '@/dictionary';
 import type { CleaningTask } from '@/features/cleanings/types';
 
 interface CleaningTaskListProps {
@@ -28,7 +29,9 @@ export function CleaningTaskList({
 		<div className="space-y-3">
 			<h4 className="text-xs font-bold uppercase text-muted-foreground tracking-wider flex items-center gap-2">
 				<ListChecks className="size-4 text-primary" />
-				{interactive ? 'Checklist' : 'Service Checklist'}
+				{interactive
+					? DICT.CLEANINGS.DETAIL.TASK_LIST.TITLE_INTERACTIVE
+					: DICT.CLEANINGS.DETAIL.TASK_LIST.TITLE}
 			</h4>
 			<div className="rounded-md border bg-muted/10 divide-y overflow-hidden">
 				{tasks.map((task, index) => (
@@ -57,7 +60,7 @@ export function CleaningTaskList({
 										{task.description}
 										{showCustomIndicator && task.is_custom && (
 											<span className="ml-2 text-[9px] font-black text-primary uppercase border border-primary/20 px-1 rounded-sm bg-primary/5 whitespace-nowrap">
-												Custom
+												{DICT.CLEANINGS.DETAIL.TASK_LIST.CUSTOM}
 											</span>
 										)}
 									</span>
@@ -70,7 +73,9 @@ export function CleaningTaskList({
 					</div>
 				))}
 				{tasks.length === 0 && (
-					<p className="text-sm text-muted-foreground text-center py-8">No tasks defined.</p>
+					<p className="text-sm text-muted-foreground text-center py-8">
+						{DICT.CLEANINGS.DETAIL.TASK_LIST.EMPTY}
+					</p>
 				)}
 			</div>
 		</div>

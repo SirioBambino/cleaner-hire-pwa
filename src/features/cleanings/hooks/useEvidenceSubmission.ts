@@ -52,7 +52,12 @@ export function useEvidenceSubmission({
 
 			const failedCount = uploadResults.filter((r) => r.status === 'rejected').length;
 			if (failedCount > 0) {
-				toast.error(`${failedCount} file(s) failed to upload.`);
+				toast.error(
+					DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.VALIDATION.UPLOAD_FAILED.replace(
+						'{count}',
+						String(failedCount),
+					),
+				);
 			}
 
 			for (const { file, path } of successfulUploads) {
@@ -69,8 +74,12 @@ export function useEvidenceSubmission({
 			await upsertReport({
 				cleaning_id: cleaning.id,
 				cleaner_id: cleaning.cleaner_id,
-				broken_items_report: values.broken_items_report ?? null,
-				low_supplies_report: values.low_supplies_report ?? null,
+				broken_items_report: values.no_broken_items
+					? null
+					: values.broken_items_report?.trim() || null,
+				low_supplies_report: values.no_low_supplies
+					? null
+					: values.low_supplies_report?.trim() || null,
 			});
 
 			await updateCleaning(cleaning.id, { clock_out_time: new Date().toISOString() });
