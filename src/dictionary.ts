@@ -83,6 +83,7 @@ export const DICT = {
 		},
 		IMAGES: {
 			ADDITIONAL: 'Additional Images',
+			ALLOWED_FILES: 'Files',
 			CURRENT: 'Current',
 			DROP_HERE: 'Drop an image here.',
 			LIMIT_REACHED: 'Additional images limit reached. Delete existing images to add more.',
@@ -319,7 +320,19 @@ export const DICT = {
 			TITLE: 'Cleaning Details',
 			BUTTON_VIEW_IMAGES: 'View Property Images',
 			PENDING_ASSIGNMENT: 'Pending assignment...',
-			REPORT_TITLE: 'Cleaning Report',
+			REPORT: {
+				TITLE: 'Cleaning Report',
+				BROKEN_ITEMS: 'Broken Items',
+				LOW_SUPPLIES: 'Low Supplies',
+				NO_BROKEN_ITEMS: 'No broken items reported',
+				NO_LOW_SUPPLIES: 'No low supplies reported',
+			},
+			TASK_LIST: {
+				TITLE: 'Service Checklist',
+				TITLE_INTERACTIVE: 'Checklist',
+				EMPTY: 'No tasks defined.',
+				CUSTOM: 'Custom',
+			},
 			CLOCK_IN: {
 				MUST_BE_AT_PROPERTY: 'You must be at the property to clock in.',
 				SUCCESS: 'Successfully clocked in!',
@@ -331,8 +344,32 @@ export const DICT = {
 			},
 			EVIDENCE: {
 				TITLE: 'Media Evidence',
+				MEDIA_ALT: 'Evidence',
 				WARNING: 'Media evidence will be automatically deleted in {days} day(s).',
 				EXPIRED: 'Media evidence has been automatically removed.',
+				FORM: {
+					LABELS: {
+						BROKEN_ITEMS: 'Any broken or damaged items?',
+						LOW_SUPPLIES: 'Any supplies running low?',
+						CLEANING_EVIDENCE: 'Cleaning Evidence',
+						NO_BROKEN_ITEMS: 'No broken or damaged items to report',
+						NO_LOW_SUPPLIES: 'No low supplies to report',
+					},
+					PLACEHOLDERS: {
+						BROKEN_ITEMS: 'Describe any issues found...',
+						LOW_SUPPLIES: 'List items like toilet paper, soap, etc...',
+					},
+					BUTTONS: {
+						COMPLETE: 'Complete Cleaning',
+						UPLOADING: 'Uploading Evidence...',
+					},
+					VALIDATION: {
+						EVIDENCE_REQUIRED: 'At least one photo or video of evidence is required',
+						UPLOAD_FAILED: '{count} file(s) failed to upload.',
+						BROKEN_ITEMS: 'Describe any broken or damaged items or confirm there are none',
+						LOW_SUPPLIES: 'Describe any low supplies or confirm there are none',
+					},
+				},
 			},
 			TOILETRIES_RESTOCK: 'Toiletries Restock',
 			RESTOCK_INCLUDED: 'Included',

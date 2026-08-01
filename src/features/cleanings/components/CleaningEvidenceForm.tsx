@@ -1,10 +1,11 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { type ChangeEvent, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import {
 	FileInput,
@@ -12,19 +13,41 @@ import {
 	FileUploaderContent,
 	FileUploaderItem,
 } from '@/components/ui/file-upload';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { VideoThumbnail } from '@/components/VideoThumbnail';
 import { DICT } from '@/dictionary';
 import { useBucketConfig } from '@/hooks/useBucketConfig';
 import { useObjectUrls } from '@/hooks/useObjectUrls';
 
-const evidenceSchema = z.object({
-	broken_items_report: z.string().optional(),
-	low_supplies_report: z.string().optional(),
-	has_evidence: z.boolean().refine((val) => val === true, {
-		message: 'At least one photo or video of evidence is required',
-	}),
-});
+const evidenceSchema = z
+	.object({
+		broken_items_report: z.string().optional(),
+		low_supplies_report: z.string().optional(),
+		no_broken_items: z.boolean(),
+		no_low_supplies: z.boolean(),
+		has_evidence: z.boolean().refine((val) => val === true, {
+			message: DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.VALIDATION.EVIDENCE_REQUIRED,
+		}),
+	})
+	.superRefine((data, ctx) => {
+		const hasBrokenItemsText = (data.broken_items_report ?? '').trim().length > 0;
+		if (!hasBrokenItemsText && !data.no_broken_items) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['no_broken_items'],
+				message: DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.VALIDATION.BROKEN_ITEMS,
+			});
+		}
+		const hasLowSuppliesText = (data.low_supplies_report ?? '').trim().length > 0;
+		if (!hasLowSuppliesText && !data.no_low_supplies) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['no_low_supplies'],
+				message: DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.VALIDATION.LOW_SUPPLIES,
+			});
+		}
+	});
 
 export type EvidenceFormValues = z.infer<typeof evidenceSchema>;
 
@@ -41,7 +64,7 @@ const FileSvgDraw = ({ accept }: { accept?: Record<string, string[]> }) => {
 				.flat()
 				.map((ext) => ext.replace('.', '').toUpperCase())
 				.join(', ')
-		: 'Files';
+		: DICT.COMMON.IMAGES.ALLOWED_FILES;
 
 	return (
 		<>
@@ -83,9 +106,19 @@ export function CleaningEvidenceForm({ onSubmit, onCancel }: CleaningEvidenceFor
 		defaultValues: {
 			broken_items_report: '',
 			low_supplies_report: '',
+			no_broken_items: false,
+			no_low_supplies: false,
 			has_evidence: false,
 		},
 	});
+
+	const brokenItemsText = useWatch({ control: form.control, name: 'broken_items_report' });
+	const lowSuppliesText = useWatch({ control: form.control, name: 'low_supplies_report' });
+	const noBrokenItems = useWatch({ control: form.control, name: 'no_broken_items' });
+	const noLowSupplies = useWatch({ control: form.control, name: 'no_low_supplies' });
+
+	const hasBrokenItemsText = (brokenItemsText ?? '').trim().length > 0;
+	const hasLowSuppliesText = (lowSuppliesText ?? '').trim().length > 0;
 
 	const handleFormSubmit = async (values: EvidenceFormValues) => {
 		setIsSubmitting(true);
@@ -103,6 +136,38 @@ export function CleaningEvidenceForm({ onSubmit, onCancel }: CleaningEvidenceFor
 		});
 	};
 
+	const handleBrokenItemsChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+		form.setValue('broken_items_report', event.target.value, {
+			shouldValidate: form.formState.isSubmitted,
+		});
+		if (event.target.value.trim().length > 0) {
+			form.setValue('no_broken_items', false, { shouldValidate: form.formState.isSubmitted });
+		}
+	};
+
+	const handleLowSuppliesChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+		form.setValue('low_supplies_report', event.target.value, {
+			shouldValidate: form.formState.isSubmitted,
+		});
+		if (event.target.value.trim().length > 0) {
+			form.setValue('no_low_supplies', false, { shouldValidate: form.formState.isSubmitted });
+		}
+	};
+
+	const handleNoBrokenItemsToggle = (isChecked: boolean) => {
+		form.setValue('no_broken_items', isChecked, { shouldValidate: form.formState.isSubmitted });
+		if (isChecked) {
+			form.setValue('broken_items_report', '', { shouldValidate: form.formState.isSubmitted });
+		}
+	};
+
+	const handleNoLowSuppliesToggle = (isChecked: boolean) => {
+		form.setValue('no_low_supplies', isChecked, { shouldValidate: form.formState.isSubmitted });
+		if (isChecked) {
+			form.setValue('low_supplies_report', '', { shouldValidate: form.formState.isSubmitted });
+		}
+	};
+
 	return (
 		<form
 			onSubmit={(e) => {
@@ -112,25 +177,61 @@ export function CleaningEvidenceForm({ onSubmit, onCancel }: CleaningEvidenceFor
 			className="space-y-4">
 			<FieldGroup>
 				<Field>
-					<FieldLabel>Any broken or damaged items?</FieldLabel>
+					<FieldLabel>{DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.LABELS.BROKEN_ITEMS}</FieldLabel>
 					<Textarea
-						{...form.register('broken_items_report')}
+						value={brokenItemsText}
+						onChange={handleBrokenItemsChange}
+						disabled={noBrokenItems}
 						className="min-h-15 resize-none"
-						placeholder="Describe any issues found..."
+						placeholder={DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.PLACEHOLDERS.BROKEN_ITEMS}
 					/>
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="no_broken_items"
+							checked={noBrokenItems}
+							onCheckedChange={(checked) => handleNoBrokenItemsToggle(checked === true)}
+							disabled={hasBrokenItemsText}
+							className="group-has-disabled/field:opacity-100"
+							aria-invalid={!!form.formState.errors.no_broken_items}
+						/>
+						<Label htmlFor="no_broken_items" className="text-sm font-normal cursor-pointer">
+							{DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.LABELS.NO_BROKEN_ITEMS}
+						</Label>
+					</div>
+					{form.formState.errors.no_broken_items && (
+						<FieldError>{form.formState.errors.no_broken_items.message}</FieldError>
+					)}
 				</Field>
 
 				<Field>
-					<FieldLabel>Any supplies running low?</FieldLabel>
+					<FieldLabel>{DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.LABELS.LOW_SUPPLIES}</FieldLabel>
 					<Textarea
-						{...form.register('low_supplies_report')}
+						value={lowSuppliesText}
+						onChange={handleLowSuppliesChange}
+						disabled={noLowSupplies}
 						className="min-h-15 resize-none"
-						placeholder="List items like toilet paper, soap, etc..."
+						placeholder={DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.PLACEHOLDERS.LOW_SUPPLIES}
 					/>
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="no_low_supplies"
+							checked={noLowSupplies}
+							onCheckedChange={(checked) => handleNoLowSuppliesToggle(checked === true)}
+							disabled={hasLowSuppliesText}
+							className="group-has-disabled/field:opacity-100"
+							aria-invalid={!!form.formState.errors.no_low_supplies}
+						/>
+						<Label htmlFor="no_low_supplies" className="text-sm font-normal cursor-pointer">
+							{DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.LABELS.NO_LOW_SUPPLIES}
+						</Label>
+					</div>
+					{form.formState.errors.no_low_supplies && (
+						<FieldError>{form.formState.errors.no_low_supplies.message}</FieldError>
+					)}
 				</Field>
 
 				<Field>
-					<FieldLabel>Cleaning Evidence</FieldLabel>
+					<FieldLabel>{DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.LABELS.CLEANING_EVIDENCE}</FieldLabel>
 					<FileUploader
 						value={files}
 						onValueChange={onFilesChange}
@@ -152,7 +253,11 @@ export function CleaningEvidenceForm({ onSubmit, onCancel }: CleaningEvidenceFor
 										{isVideo ? (
 											<VideoThumbnail src={previewUrls[i] ?? ''} className="size-20" />
 										) : (
-											<img src={previewUrls[i]} alt="preview" className="object-cover size-20" />
+											<img
+												src={previewUrls[i]}
+												alt={DICT.COMMON.IMAGES.PREVIEW}
+												className="object-cover size-20"
+											/>
 										)}
 									</FileUploaderItem>
 								);
@@ -173,14 +278,16 @@ export function CleaningEvidenceForm({ onSubmit, onCancel }: CleaningEvidenceFor
 						className="flex-1"
 						onClick={onCancel}
 						disabled={isSubmitting || form.formState.isSubmitting}>
-						Back
+						{DICT.COMMON.ACTIONS.BACK}
 					</Button>
 				)}
 				<Button
 					type="submit"
 					className="flex-1"
 					disabled={isSubmitting || form.formState.isSubmitting}>
-					{isSubmitting ? 'Uploading Evidence...' : 'Complete Cleaning'}
+					{isSubmitting
+						? DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.BUTTONS.UPLOADING
+						: DICT.CLEANINGS.DETAIL.EVIDENCE.FORM.BUTTONS.COMPLETE}
 				</Button>
 			</div>
 		</form>

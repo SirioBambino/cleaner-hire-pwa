@@ -27,26 +27,28 @@ export function CleaningReportView({
 		<div className="grid grid-cols-1 gap-6 pt-2 w-full overflow-hidden">
 			{cleaning.report && (
 				<div className="grid grid-cols-1 gap-4">
-					{cleaning.report.broken_items_report && (
-						<div className="space-y-2">
-							<h4 className="text-xs font-bold uppercase text-destructive tracking-wider flex items-center gap-2">
-								<AlertCircle className="size-4" /> Broken Items
-							</h4>
-							<div className="p-3 rounded-md border border-destructive/20 bg-destructive/5">
-								<p className="text-sm">{cleaning.report.broken_items_report}</p>
-							</div>
+					<div className="space-y-2">
+						<h4 className="text-xs font-bold uppercase text-destructive tracking-wider flex items-center gap-2">
+							<AlertCircle className="size-4" /> {DICT.CLEANINGS.DETAIL.REPORT.BROKEN_ITEMS}
+						</h4>
+						<div className="p-3 rounded-md border border-destructive/20 bg-destructive/5">
+							<p className="text-sm">
+								{cleaning.report.broken_items_report ||
+									DICT.CLEANINGS.DETAIL.REPORT.NO_BROKEN_ITEMS}
+							</p>
 						</div>
-					)}
-					{cleaning.report.low_supplies_report && (
-						<div className="space-y-2">
-							<h4 className="text-xs font-bold uppercase text-warning tracking-wider flex items-center gap-2">
-								<Package className="size-4" /> Low Supplies
-							</h4>
-							<div className="p-3 rounded-md border border-warning-light bg-warning-background">
-								<p className="text-sm">{cleaning.report.low_supplies_report}</p>
-							</div>
+					</div>
+					<div className="space-y-2">
+						<h4 className="text-xs font-bold uppercase text-warning tracking-wider flex items-center gap-2">
+							<Package className="size-4" /> {DICT.CLEANINGS.DETAIL.REPORT.LOW_SUPPLIES}
+						</h4>
+						<div className="p-3 rounded-md border border-warning-light bg-warning-background">
+							<p className="text-sm">
+								{cleaning.report.low_supplies_report ||
+									DICT.CLEANINGS.DETAIL.REPORT.NO_LOW_SUPPLIES}
+							</p>
 						</div>
-					)}
+					</div>
 				</div>
 			)}
 
@@ -67,7 +69,7 @@ export function CleaningReportView({
 										<ImageWithFallback
 											src={evidenceMedia[index]?.url ?? item.media_url}
 											className="size-full object-cover"
-											alt="Evidence"
+											alt={DICT.CLEANINGS.DETAIL.EVIDENCE.MEDIA_ALT}
 										/>
 									) : (
 										<VideoThumbnail

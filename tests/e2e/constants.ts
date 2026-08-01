@@ -117,6 +117,10 @@ export const DICT = {
 				BUTTON_COMPLETE: 'Complete Cleaning',
 				BUTTON_UPLOADING: 'Uploading Evidence...',
 			},
+			CHECKBOXES: {
+				NO_BROKEN_ITEMS: 'No broken or damaged items to report',
+				NO_LOW_SUPPLIES: 'No low supplies to report',
+			},
 			STATUS_ASSIGNED: 'ASSIGNED',
 			STATUS_IN_PROGRESS: 'In Progress',
 			STATUS_COMPLETED: 'Completed',

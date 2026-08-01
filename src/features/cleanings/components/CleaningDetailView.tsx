@@ -213,7 +213,7 @@ export function CleaningDetailView({
 					<div className="space-y-1 min-w-0">
 						<DialogTitle className="wrap-break-word text-xl font-bold leading-tight">
 							{showEvidenceForm
-								? DICT.CLEANINGS.DETAIL.REPORT_TITLE
+								? DICT.CLEANINGS.DETAIL.REPORT.TITLE
 								: cleaning.property?.address_line_1}
 						</DialogTitle>
 						{!showEvidenceForm && (
@@ -313,7 +313,7 @@ export function CleaningDetailView({
 				initialMedia={evidenceMedia[selectedMediaIndex]?.url}
 				open={isFullScreen}
 				onOpenChange={setIsFullScreen}
-				alt="Evidence"
+				alt={DICT.CLEANINGS.DETAIL.EVIDENCE.MEDIA_ALT}
 			/>
 
 			<FullscreenMediaCarousel
@@ -321,7 +321,7 @@ export function CleaningDetailView({
 				initialMedia={propertyMedia[0]?.url}
 				open={propertyGalleryOpen}
 				onOpenChange={setPropertyGalleryOpen}
-				alt="Property"
+				alt={DICT.COMMON.LABELS.PROPERTY}
 			/>
 		</div>
 	);
