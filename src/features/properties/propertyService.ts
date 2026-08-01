@@ -3,7 +3,7 @@ import { type ActionResult, mapDatabaseError } from '@/lib/serviceUtils';
 import { supabase } from '@/lib/supabaseClient';
 
 export const propertyService = {
-	async getProperties(): Promise<ActionResult<Property[]>> {
+	async getProperties(signal?: AbortSignal): Promise<ActionResult<Property[]>> {
 		const {
 			data: { user },
 		} = await supabase.auth.getUser();
@@ -12,11 +12,13 @@ export const propertyService = {
 			return { data: [], error: 'Not authenticated' };
 		}
 
-		const { data, error } = await supabase
-			.from('properties')
-			.select('*')
-			.eq('host_id', user.id)
-			.order('created_at', { ascending: false });
+		let query = supabase.from('properties').select('*').eq('host_id', user.id);
+
+		if (signal) {
+			query = query.abortSignal(signal);
+		}
+
+		const { data, error } = await query.order('created_at', { ascending: false });
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };

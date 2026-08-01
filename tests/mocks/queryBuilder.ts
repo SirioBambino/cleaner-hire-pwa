@@ -29,6 +29,7 @@ export function createDefaultQueryBuilder() {
 		rangeGte: vi.fn().mockReturnThis(),
 		rangeLt: vi.fn().mockReturnThis(),
 		rangeLte: vi.fn().mockReturnThis(),
+		abortSignal: vi.fn().mockReturnThis(),
 		order: vi.fn().mockReturnThis(),
 		limit: vi.fn().mockReturnThis(),
 		range: vi.fn().mockReturnThis(),

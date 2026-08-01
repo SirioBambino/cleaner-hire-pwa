@@ -44,7 +44,7 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
 				setIsLoading(true);
 			}
 
-			const { data, error } = await propertyService.getProperties();
+			const { data, error } = await propertyService.getProperties(signal);
 
 			if (signal?.aborted) {
 				if (!skipLoadingState) {

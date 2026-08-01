@@ -35,10 +35,6 @@ export function useCleaningsRealtime({
 			return;
 		}
 
-		if (import.meta.env.DEV) {
-			return;
-		}
-
 		const isCleaner = profile.role === 'cleaner';
 		const isHost = profile.role === 'host';
 
