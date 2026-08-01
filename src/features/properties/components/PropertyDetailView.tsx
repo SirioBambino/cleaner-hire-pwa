@@ -1,7 +1,7 @@
 'use client';
 
 import { Bath, Bed, MapPin, Maximize2, Pencil, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FullscreenMediaCarousel } from '@/components/FullscreenMediaCarousel';
 import { ImageWithFallback } from '@/components/ImageWithFallback';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ import { useAuth } from '@/features/auth/AuthContext';
 import type { Property } from '@/features/properties/types';
 import { useCarousel } from '@/hooks/useCarousel';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
-import { mediaService } from '@/lib/mediaService';
+import { useMediaUrls } from '@/hooks/useMediaUrls';
 import { formatPostcode } from '@/lib/utils';
 
 interface PropertyDetailViewProps {
@@ -29,31 +29,9 @@ interface PropertyDetailViewProps {
 export function PropertyDetailView({ property, onEdit, onDelete }: PropertyDetailViewProps) {
 	const { user } = useAuth();
 	const [isFullScreen, setIsFullScreen] = useState(false);
-	const [extraImageUrls, setExtraImageUrls] = useState<string[]>([]);
 
 	const mainImageUrl = useMediaUrl(property.main_image_url, 'property-media');
-
-	useEffect(() => {
-		const paths = property.extra_images_urls;
-		if (!paths || paths.length === 0) {
-			setExtraImageUrls([]);
-			return;
-		}
-
-		let cancelled = false;
-
-		Promise.all(paths.map(async (path) => mediaService.getSignedUrl(path, 'property-media'))).then(
-			(results) => {
-				if (!cancelled) {
-					setExtraImageUrls(results.map((url) => url ?? '/placeholder-image.webp'));
-				}
-			},
-		);
-
-		return () => {
-			cancelled = true;
-		};
-	}, [property.extra_images_urls]);
+	const extraImageUrls = useMediaUrls(property.extra_images_urls, 'property-media');
 
 	const images = useMemo(
 		() => [mainImageUrl || '/placeholder-image.webp', ...extraImageUrls],

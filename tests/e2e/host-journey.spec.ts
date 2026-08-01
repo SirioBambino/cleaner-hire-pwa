@@ -57,7 +57,7 @@ test.describe('Host journey', () => {
 			await expect(page.getByText(DICT.DASHBOARD.HOST.STATS.CONFIRMED)).toBeVisible();
 			await expect(page.getByText(DICT.DASHBOARD.HOST.STATS.IN_PROGRESS)).toBeVisible();
 			await expect(page.getByText(DICT.DASHBOARD.HOST.STATS.REQUESTED)).toBeVisible();
-			await expect(page.getByText(DICT.DASHBOARD.HOST.STATS.PROPERTIES)).toBeVisible();
+			await expect(page.getByText(DICT.DASHBOARD.HOST.STATS.TOTAL_COSTS)).toBeVisible();
 		});
 
 		test('navigates to properties page and views property', async ({ page }) => {
@@ -83,6 +83,14 @@ test.describe('Host journey', () => {
 			await page.fill('#postcode', 'M1 1AA');
 			await page.fill('#bedrooms', '3');
 			await page.fill('#bathrooms', '2');
+			await page
+				.locator('input[type="file"]')
+				.first()
+				.setInputFiles({
+					name: 'property.jpg',
+					mimeType: 'image/jpeg',
+					buffer: Buffer.from('fake-image-data'),
+				});
 
 			await page.getByRole('button', { name: DICT.PROPERTIES.FORM.BUTTON_SUBMIT }).click();
 
@@ -101,6 +109,14 @@ test.describe('Host journey', () => {
 			await expectDialogWithTitle(page, DICT.PROPERTIES.EDIT.TITLE);
 
 			await page.fill('#address_line_1', '123 Updated Street');
+			await page
+				.locator('input[type="file"]')
+				.first()
+				.setInputFiles({
+					name: 'property.jpg',
+					mimeType: 'image/jpeg',
+					buffer: Buffer.from('fake-image-data'),
+				});
 
 			await page.getByRole('button', { name: DICT.PROPERTIES.FORM.BUTTON_UPDATE }).click();
 

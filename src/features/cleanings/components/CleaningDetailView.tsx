@@ -1,7 +1,7 @@
 'use client';
 
 import { Image, MapPin } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { EntityBadge } from '@/components/EntityBadge';
 import { FullscreenMediaCarousel } from '@/components/FullscreenMediaCarousel';
 import { Button } from '@/components/ui/button';
@@ -23,8 +23,7 @@ import { useEvidenceSubmission } from '@/features/cleanings/hooks/useEvidenceSub
 import { useTaskSync } from '@/features/cleanings/hooks/useTaskSync';
 import type { CleaningRequest } from '@/features/cleanings/types';
 import { CLEANING_STATUS } from '@/features/cleanings/types';
-import type { Database } from '@/lib/database.types';
-import { mediaService } from '@/lib/mediaService';
+import { useMediaUrls } from '@/hooks/useMediaUrls';
 import { formatPostcode } from '@/lib/utils';
 
 interface CleaningDetailViewProps {
@@ -126,72 +125,34 @@ export function CleaningDetailView({
 		[tasks],
 	);
 
-	const [evidenceMedia, setEvidenceMedia] = useState<
-		{ url: string; type: Database['public']['Enums']['media_type'] }[]
-	>([]);
-
 	const [propertyGalleryOpen, setPropertyGalleryOpen] = useState(false);
-	const [propertyMedia, setPropertyMedia] = useState<{ url: string; type: 'image' }[]>([]);
 
-	useEffect(() => {
-		if (evidence.length === 0) {
-			setEvidenceMedia([]);
-			return;
-		}
-
-		let cancelled = false;
-
-		Promise.all(
-			evidence.map(async (item) => ({
-				url:
-					(await mediaService.getSignedUrl(item.media_url, 'cleaning-media')) ??
-					'/placeholder-image.webp',
+	const evidencePaths = useMemo(() => evidence.map((item) => item.media_url), [evidence]);
+	const evidenceUrls = useMediaUrls(evidencePaths, 'cleaning-media');
+	const evidenceMedia = useMemo(
+		() =>
+			evidence.map((item, index) => ({
+				url: evidenceUrls[index] ?? '/placeholder-image.webp',
 				type: item.type,
 			})),
-		).then((results) => {
-			if (!cancelled) {
-				setEvidenceMedia(results);
-			}
-		});
+		[evidence, evidenceUrls],
+	);
 
-		return () => {
-			cancelled = true;
-		};
-	}, [evidence]);
-
-	useEffect(() => {
+	const propertyPaths = useMemo(() => {
 		const property = cleaning.property;
 		if (!property) {
-			setPropertyMedia([]);
-			return;
+			return [];
 		}
-
-		const paths = [property.main_image_url, ...(property.extra_images_urls ?? [])].filter(
+		return [property.main_image_url, ...(property.extra_images_urls ?? [])].filter(
 			Boolean,
 		) as string[];
-
-		if (paths.length === 0) {
-			setPropertyMedia([]);
-			return;
-		}
-
-		let cancelled = false;
-
-		Promise.all(
-			paths.map(async (path) => ({
-				url: (await mediaService.getSignedUrl(path, 'property-media')) ?? '/placeholder-image.webp',
-				type: 'image' as const,
-			})),
-		).then((results) => {
-			if (!cancelled) {
-				setPropertyMedia(results);
-			}
-		});
-
-		return () => {
-			cancelled = true;
-		};
 	}, [cleaning.property?.main_image_url, cleaning.property?.extra_images_urls, cleaning.property]);
+
+	const propertyMediaUrls = useMediaUrls(propertyPaths, 'property-media');
+	const propertyMedia = useMemo(
+		() => propertyMediaUrls.map((url) => ({ url, type: 'image' as const })),
+		[propertyMediaUrls],
+	);
 
 	const expiryInfo = useMemo(() => {
 		if (!cleaning.clock_out_time) {
