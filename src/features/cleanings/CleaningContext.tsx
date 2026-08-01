@@ -74,7 +74,7 @@ export function CleaningProvider({ children }: { children: ReactNode }) {
 				setIsLoading(true);
 			}
 
-			const { data, error } = await cleaningsService.getCleaningRequests(profile?.role);
+			const { data, error } = await cleaningsService.getCleaningRequests(profile?.role, signal);
 
 			if (signal?.aborted) {
 				if (!skipLoadingState) {

@@ -40,7 +40,10 @@ export const normaliseCleaningRequest = (item: RawCleaningRequestQueryResult): C
 };
 
 export const cleaningRequestService = {
-	async getCleaningRequests(role?: string): Promise<ActionResult<CleaningRequest[]>> {
+	async getCleaningRequests(
+		role?: string,
+		signal?: AbortSignal,
+	): Promise<ActionResult<CleaningRequest[]>> {
 		const {
 			data: { user },
 		} = await supabase.auth.getUser();
@@ -76,6 +79,10 @@ export const cleaningRequestService = {
 			query = query.eq('host_id', user.id);
 		} else if (role === 'cleaner') {
 			query = query.eq('cleaner_id', user.id);
+		}
+
+		if (signal) {
+			query = query.abortSignal(signal);
 		}
 
 		const { data, error } = await query.order('created_at', { ascending: false });

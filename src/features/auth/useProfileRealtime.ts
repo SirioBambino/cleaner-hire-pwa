@@ -16,10 +16,6 @@ export function useProfileRealtime(
 	onProfileUpdateRef.current = onProfileUpdate;
 
 	useEffect(() => {
-		if (import.meta.env.DEV) {
-			return;
-		}
-
 		if (!userId) {
 			if (profileChannelRef.current) {
 				supabase.removeChannel(profileChannelRef.current);
@@ -51,7 +47,7 @@ export function useProfileRealtime(
 				},
 			)
 			.subscribe((status: string, err?: unknown) => {
-				if (err) {
+				if (err && import.meta.env.PROD) {
 					console.error('[Auth] Profile channel error', { status, error: err });
 				}
 			});
@@ -67,10 +63,6 @@ export function useProfileRealtime(
 	}, [userId]);
 
 	const reconnect = () => {
-		if (import.meta.env.DEV) {
-			return;
-		}
-
 		if (!profileChannelRef.current || profileChannelRef.current.state !== 'joined') {
 			const currentUserId = userId;
 			if (!currentUserId) {
