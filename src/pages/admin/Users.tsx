@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { toast } from '@/components/Toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { DebouncedInput } from '@/components/ui/debounced-input';
 import {
 	Select,
 	SelectContent,
@@ -52,6 +52,8 @@ export function AdminUsersPage() {
 
 	const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 	const dialogs = useAdminActionDialogs();
+	const usersDict = DICT.ADMIN.USERS;
+	const commonLabels = DICT.COMMON.LABELS;
 
 	const handleResetPasswordClick = (userId: string) => {
 		const user = users.find((u) => u.id === userId);
@@ -114,7 +116,9 @@ export function AdminUsersPage() {
 		<main className="max-width-container p-2 md:p-8">
 			<header className="mb-6">
 				<div className="space-y-1">
-					<h1 className="text-3xl font-bold uppercase text-center md:text-left">User Management</h1>
+					<h1 className="text-3xl font-bold uppercase text-center md:text-left">
+						{usersDict.TITLE}
+					</h1>
 				</div>
 			</header>
 
@@ -124,28 +128,28 @@ export function AdminUsersPage() {
 						<Users />
 					</StatIndicator>
 					<StatValue>{totalCount}</StatValue>
-					<StatLabel>Total Users</StatLabel>
+					<StatLabel>{usersDict.STATS.TOTAL}</StatLabel>
 				</Stat>
 				<Stat>
 					<StatIndicator variant="icon" className="text-success">
 						<User />
 					</StatIndicator>
 					<StatValue>{onlineCount}</StatValue>
-					<StatLabel>Online</StatLabel>
+					<StatLabel>{commonLabels.ONLINE}</StatLabel>
 				</Stat>
 				<Stat>
 					<StatIndicator variant="icon" className="text-warning">
 						<ClockFading />
 					</StatIndicator>
 					<StatValue>{recentlyOnline}</StatValue>
-					<StatLabel>Recently Online (7d)</StatLabel>
+					<StatLabel>{usersDict.STATS.RECENTLY_ONLINE}</StatLabel>
 				</Stat>
 				<Stat>
 					<StatIndicator variant="icon" className="text-destructive">
 						<ShieldBan />
 					</StatIndicator>
 					<StatValue>{bannedCount}</StatValue>
-					<StatLabel>Banned</StatLabel>
+					<StatLabel>{usersDict.FILTER.BANNED}</StatLabel>
 				</Stat>
 			</div>
 
@@ -154,10 +158,11 @@ export function AdminUsersPage() {
 					<div className="flex flex-col sm:flex-row gap-3">
 						<div className="relative flex-1">
 							<Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-							<Input
-								placeholder="Search users..."
+							<DebouncedInput
+								placeholder={usersDict.SEARCH_PLACEHOLDER}
 								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
+								onValueChange={setSearchQuery}
+								debounceMs={300}
 								onKeyDown={(e) => {
 									if (e.key === 'Enter') {
 										setPage(1);
@@ -173,19 +178,19 @@ export function AdminUsersPage() {
 								setPage(1);
 							}}>
 							<SelectTrigger className="w-[130px]">
-								<SelectValue placeholder="Role" />
+								<SelectValue placeholder={commonLabels.ROLE} />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value="all">All Roles</SelectItem>
-								<SelectItem value="host">Hosts</SelectItem>
-								<SelectItem value="cleaner">Cleaners</SelectItem>
-								<SelectItem value="admin">Admins</SelectItem>
+								<SelectItem value="all">{usersDict.ROLE_FILTER.ALL}</SelectItem>
+								<SelectItem value="host">{usersDict.ROLE_FILTER.HOSTS}</SelectItem>
+								<SelectItem value="cleaner">{usersDict.ROLE_FILTER.CLEANERS}</SelectItem>
+								<SelectItem value="admin">{usersDict.ROLE_FILTER.ADMINS}</SelectItem>
 							</SelectContent>
 						</Select>
 						<Button className="h-8" onClick={() => setIsInviteModalOpen(true)}>
 							<Plus className="size-4 mr-1" />
-							<span className="sm:hidden">Invite</span>
-							<span className="hidden sm:inline">Invite User</span>
+							<span className="sm:hidden">{usersDict.INVITE_BUTTON.SHORT}</span>
+							<span className="hidden sm:inline">{usersDict.INVITE_BUTTON.FULL}</span>
 						</Button>
 					</div>
 				</CardContent>

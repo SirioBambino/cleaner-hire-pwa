@@ -155,7 +155,7 @@ export function UserDetailLayout({
 	}
 
 	return (
-		<main className="max-width-container py-8">
+		<main className="max-width-container p-2 md:p-8">
 			<div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6">
 				<Card className="flex-1 p-0 overflow-hidden">
 					<UserCard

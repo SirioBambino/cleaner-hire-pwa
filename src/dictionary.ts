@@ -311,6 +311,7 @@ export const DICT = {
 		NEW: 'New cleaning request',
 		NOT_FOUND: 'Cleaning request not found.',
 		UNASSIGNED: 'Unassigned',
+		ASSIGNED: 'Assigned',
 		EMPTY: {
 			MESSAGE_HOST: "You haven't booked any cleaning services yet.",
 			MESSAGE_CLEANER: "You don't have any cleaning jobs assigned to you yet.",
@@ -510,6 +511,14 @@ export const DICT = {
 			MESSAGE: 'Manage platform users',
 			TABS: { ALL: 'All Users', HOSTS: 'Hosts', CLEANERS: 'Cleaners', ADMINS: 'Admins' },
 			FILTER: { ACTIVE: 'Online', BANNED: 'Banned', ALL: 'All' },
+			ROLE_FILTER: {
+				ALL: 'All Roles',
+				HOSTS: 'Hosts',
+				CLEANERS: 'Cleaners',
+				ADMINS: 'Admins',
+			},
+			STATS: { TOTAL: 'Total Users', RECENTLY_ONLINE: 'Recently Online (7d)' },
+			INVITE_BUTTON: { SHORT: 'Invite', FULL: 'Invite User' },
 			SEARCH_PLACEHOLDER: 'Search by name or email...',
 			STATUS_LABELS: { ACTIVE: 'Active', BANNED: 'Banned', UNKNOWN: 'Unknown' },
 			DETAIL: {
