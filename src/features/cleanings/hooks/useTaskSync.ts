@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from '@/components/Toast';
 import type { CleaningRequest, CleaningTask } from '@/features/cleanings/types';
 import { CLEANING_STATUS } from '@/features/cleanings/types';
+import { CONFIG } from '@/lib/config';
 
 interface UseTaskSyncOptions {
 	cleaning: CleaningRequest;
@@ -43,7 +44,6 @@ export function useTaskSync({ cleaning, updateTasksBatch }: UseTaskSyncOptions):
 	const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const isSyncingRef = useRef(false);
 	const syncRetryCountRef = useRef(0);
-	const MAX_SYNC_RETRIES = 3;
 	const shouldSyncOnUnmountRef = useRef(false);
 
 	useEffect(() => {
@@ -87,7 +87,7 @@ export function useTaskSync({ cleaning, updateTasksBatch }: UseTaskSyncOptions):
 				setHasLocalChanges(false);
 			} else {
 				syncRetryCountRef.current += 1;
-				if (syncRetryCountRef.current >= MAX_SYNC_RETRIES) {
+				if (syncRetryCountRef.current >= CONFIG.TASK_SYNC_MAX_RETRIES) {
 					toast.error('Failed to sync tasks after multiple attempts');
 					syncRetryCountRef.current = 0;
 					setHasLocalChanges(false);
@@ -95,7 +95,7 @@ export function useTaskSync({ cleaning, updateTasksBatch }: UseTaskSyncOptions):
 			}
 		} catch {
 			syncRetryCountRef.current += 1;
-			if (syncRetryCountRef.current >= MAX_SYNC_RETRIES) {
+			if (syncRetryCountRef.current >= CONFIG.TASK_SYNC_MAX_RETRIES) {
 				toast.error('Failed to sync tasks after multiple attempts');
 				syncRetryCountRef.current = 0;
 				setHasLocalChanges(false);

@@ -5,10 +5,6 @@ import { authService } from '@/features/auth/services/authService';
 import { pushSubscriptionsService } from '@/features/notifications/pushSubscriptionsService';
 import type { Json } from '@/lib/database.types';
 
-const pushConfig = {
-	vapidPublicKey: import.meta.env.VITE_VAPID_PUBLIC_KEY || '',
-};
-
 type PermissionState = 'default' | 'granted' | 'denied' | 'unsupported';
 
 interface UsePushNotificationsResult {
@@ -88,7 +84,9 @@ export function usePushNotifications(
 				return { success: false, error: 'Push notifications not supported' };
 			}
 
-			if (!pushConfig.vapidPublicKey) {
+			const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
+
+			if (!vapidPublicKey) {
 				return { success: false, error: 'VAPID public key not configured' };
 			}
 
@@ -97,7 +95,7 @@ export function usePushNotifications(
 			try {
 				const registration = await navigator.serviceWorker.ready;
 
-				localStorage.setItem('vapidPublicKey', pushConfig.vapidPublicKey);
+				localStorage.setItem('vapidPublicKey', vapidPublicKey);
 
 				const existingSub = await registration.pushManager.getSubscription();
 				if (existingSub) {
@@ -106,14 +104,12 @@ export function usePushNotifications(
 
 				const subscription = await registration.pushManager.subscribe({
 					userVisibleOnly: true,
-					applicationServerKey: pushConfig.vapidPublicKey,
+					applicationServerKey: vapidPublicKey,
 				});
 
 				const subscriptionJson = subscription.toJSON() as unknown as Json;
 
-				await pushSubscriptionsService.deleteByUserId(userId);
-
-				const { error } = await pushSubscriptionsService.insert(userId, subscriptionJson);
+				const { error } = await pushSubscriptionsService.upsert(userId, subscriptionJson);
 
 				if (error) {
 					if (import.meta.env.DEV) {

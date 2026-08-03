@@ -24,6 +24,7 @@ import type {
 	UpdateCleaningRequestPayload,
 } from '@/features/cleanings/types';
 import { useVisibilityReconnect } from '@/hooks/useVisibilityReconnect';
+import { CONFIG } from '@/lib/config';
 import { useCleaningsOperations } from './hooks/useCleaningsOperations';
 import { useCleaningsRealtime } from './hooks/useCleaningsRealtime';
 
@@ -118,13 +119,12 @@ export function CleaningProvider({ children }: { children: ReactNode }) {
 	});
 
 	const lastCleaningFetchRef = useRef(0);
-	const CLEANING_STALE_THRESHOLD_MS = 60_000;
 
 	useVisibilityReconnect({
 		enabled: !!user && !!profile,
 		onVisible: async () => {
 			const now = Date.now();
-			if (now - lastCleaningFetchRef.current > CLEANING_STALE_THRESHOLD_MS) {
+			if (now - lastCleaningFetchRef.current > CONFIG.CLEANING_STALE_THRESHOLD_MS) {
 				lastCleaningFetchRef.current = now;
 				await fetchCleanings(undefined, true);
 			}
