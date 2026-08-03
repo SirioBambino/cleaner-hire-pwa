@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '@/features/auth/services/authService';
+import { CONFIG } from '@/lib/config';
 
 /**
  * Hook that automatically logs out the user after a period of inactivity.
@@ -14,7 +15,7 @@ import { authService } from '@/features/auth/services/authService';
  * useInactivityLogout(15 * 60 * 1000); // 15 min timeout
  * ```
  */
-export function useInactivityLogout(timeoutMs = 30 * 60 * 1000) {
+export function useInactivityLogout(timeoutMs = CONFIG.INACTIVITY_TIMEOUT_MS) {
 	const navigate = useNavigate();
 	const timeoutRef = useRef<number | null>(null);
 

@@ -5,11 +5,13 @@ import { type ActionResult, mapDatabaseError } from '@/lib/serviceUtils';
 import { supabase } from '@/lib/supabaseClient';
 
 export const pushSubscriptionsService = {
-	async insert(userId: string, subscription: Json): Promise<ActionResult<void>> {
-		const { error } = await supabase.from('push_subscriptions').insert({
-			user_id: userId,
-			subscription,
-		});
+	async upsert(userId: string, subscription: Json): Promise<ActionResult<void>> {
+		const { error } = await supabase
+			.from('push_subscriptions')
+			.upsert(
+				{ user_id: userId, subscription, updated_at: new Date().toISOString() },
+				{ onConflict: 'user_id' },
+			);
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };
@@ -23,16 +25,6 @@ export const pushSubscriptionsService = {
 			.from('push_subscriptions')
 			.delete()
 			.eq('subscription->>endpoint', endpoint);
-
-		if (error) {
-			return { data: null, error: mapDatabaseError(error) };
-		}
-
-		return { data: undefined, error: null };
-	},
-
-	async deleteByUserId(userId: string): Promise<ActionResult<void>> {
-		const { error } = await supabase.from('push_subscriptions').delete().eq('user_id', userId);
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };

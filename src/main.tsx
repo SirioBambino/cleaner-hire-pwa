@@ -11,10 +11,9 @@ import { CleanerPayProvider } from '@/features/cleanings/CleanerPayContext';
 import { CleaningProvider } from '@/features/cleanings/CleaningContext';
 import { NotificationProvider } from '@/features/notifications/NotificationContext';
 import { PropertyProvider } from '@/features/properties/PropertyContext';
+import { CONFIG } from '@/lib/config';
 import { router } from '@/routes.tsx';
 import '@/index.css';
-
-const SW_UPDATE_INTERVAL = 30 * 60 * 1000;
 
 registerSW({
 	onRegisteredSW(_swUrl, registration) {
@@ -24,7 +23,7 @@ registerSW({
 
 		setInterval(() => {
 			registration.update();
-		}, SW_UPDATE_INTERVAL);
+		}, CONFIG.SW_UPDATE_INTERVAL_MS);
 	},
 });
 

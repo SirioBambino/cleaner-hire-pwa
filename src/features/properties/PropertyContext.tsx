@@ -15,6 +15,7 @@ import { useAuth } from '@/features/auth/AuthContext';
 import { propertyService } from '@/features/properties/propertyService';
 import type { Property, PropertyInsert } from '@/features/properties/types';
 import { useVisibilityReconnect } from '@/hooks/useVisibilityReconnect';
+import { CONFIG } from '@/lib/config';
 
 interface PropertyContextType {
 	properties: Property[];
@@ -81,13 +82,12 @@ export function PropertyProvider({ children }: { children: ReactNode }) {
 	}, [user, profile?.role, fetchProperties]);
 
 	const lastFetchedRef = useRef(0);
-	const STALE_THRESHOLD_MS = 60_000;
 
 	useVisibilityReconnect({
 		enabled: !!user && profile?.role === 'host',
 		onVisible: async () => {
 			const now = Date.now();
-			if (now - lastFetchedRef.current > STALE_THRESHOLD_MS) {
+			if (now - lastFetchedRef.current > CONFIG.PROPERTY_STALE_THRESHOLD_MS) {
 				lastFetchedRef.current = now;
 				await fetchProperties(undefined, true);
 			}
