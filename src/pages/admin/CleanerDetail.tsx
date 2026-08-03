@@ -4,9 +4,8 @@ import { BrushCleaning, ClipboardList, Clock, Sparkles } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from '@/components/Toast';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { DICT } from '@/dictionary';
+import { CleaningsFilter } from '@/features/admin/components/CleaningsFilter';
 import { CleaningsTable } from '@/features/admin/components/CleaningsTable';
 import { useAdminUsers } from '@/features/admin/hooks/useAdminUsers';
 import { useCleanerDetail } from '@/features/admin/hooks/useCleanerDetail';
@@ -23,6 +22,8 @@ export function AdminCleanerDetailPage() {
 	const navigate = useNavigate();
 	const [cleaningsSortField, setCleaningsSortField] = useState<string>('scheduled_start');
 	const [cleaningsSortDirection, setCleaningsSortDirection] = useState<'asc' | 'desc'>('desc');
+	const [cleaningsSearchQuery, setCleaningsSearchQuery] = useState('');
+	const [cleaningsStatusFilter, setCleaningsStatusFilter] = useState('all');
 	const [cleaningsUpcomingFilter, setCleaningsUpcomingFilter] = useState(false);
 
 	const { cleaner, loading, refresh } = useCleanerDetail(id, {
@@ -120,12 +121,31 @@ export function AdminCleanerDetailPage() {
 	const dict = DICT.ADMIN.CLEANINGS.DETAIL.CLEANER_DETAIL;
 
 	const filteredCleanings = useMemo(() => {
-		if (!cleaningsUpcomingFilter) {
-			return cleanings;
-		}
 		const now = new Date();
-		return cleanings.filter((c) => new Date(c.scheduled_start) >= now);
-	}, [cleanings, cleaningsUpcomingFilter]);
+		const normalizedSearch = cleaningsSearchQuery.trim().toLowerCase();
+		return cleanings.filter((c) => {
+			if (cleaningsUpcomingFilter && new Date(c.scheduled_start) < now) {
+				return false;
+			}
+			if (cleaningsStatusFilter !== 'all' && c.status !== cleaningsStatusFilter) {
+				return false;
+			}
+			if (normalizedSearch) {
+				const haystack = [
+					c.host_name,
+					c.property_address,
+					c.property_postcode,
+					c.property_town_city,
+				]
+					.map((value) => (value ?? '').toLowerCase())
+					.join(' ');
+				if (!haystack.includes(normalizedSearch)) {
+					return false;
+				}
+			}
+			return true;
+		});
+	}, [cleanings, cleaningsUpcomingFilter, cleaningsStatusFilter, cleaningsSearchQuery]);
 
 	if (!cleaner) {
 		return null;
@@ -200,16 +220,24 @@ export function AdminCleanerDetailPage() {
 					title: dict.TITLE,
 					content: (
 						<div className="space-y-3">
-							<div className="flex items-center gap-2">
-								<Checkbox
-									id="cleaner-cleanings-upcoming"
-									checked={cleaningsUpcomingFilter}
-									onCheckedChange={(checked) => setCleaningsUpcomingFilter(checked === true)}
-								/>
-								<Label htmlFor="cleaner-cleanings-upcoming" className="text-sm cursor-pointer">
-									{DICT.ADMIN.CLEANINGS.FILTERS.ONLY_UPCOMING}
-								</Label>
-							</div>
+							<CleaningsFilter
+								searchQuery={cleaningsSearchQuery}
+								onSearchChange={setCleaningsSearchQuery}
+								searchDebounceMs={300}
+								statusFilter={cleaningsStatusFilter}
+								onStatusChange={setCleaningsStatusFilter}
+								cleanerFilter="all"
+								onCleanerChange={() => undefined}
+								upcomingFilter={cleaningsUpcomingFilter}
+								onUpcomingChange={setCleaningsUpcomingFilter}
+								onClear={() => {
+									setCleaningsSearchQuery('');
+									setCleaningsStatusFilter('all');
+									setCleaningsUpcomingFilter(false);
+								}}
+								availableCleaners={availableCleaners}
+								showCleanerFilter={false}
+							/>
 							<CleaningsTable
 								data={tableData}
 								fetchById={fetchCleaningById}

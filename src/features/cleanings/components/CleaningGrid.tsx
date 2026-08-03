@@ -2,7 +2,7 @@
 
 import { ArrowDownUp, ListFilter, Search } from 'lucide-react';
 import { useState } from 'react';
-import { Input } from '@/components/ui/input';
+import { DebouncedInput } from '@/components/ui/debounced-input';
 import {
 	Select,
 	SelectContent,
@@ -42,10 +42,11 @@ export function CleaningGrid({ onView, onEdit, onDelete, userRole }: CleaningGri
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
 				<div className="relative flex-1 sm:max-w-100">
 					<Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-					<Input
+					<DebouncedInput
 						placeholder={dict.SEARCH.PLACEHOLDER}
 						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
+						onValueChange={setSearchQuery}
+						debounceMs={300}
 						className="h-8 pl-9 focus-visible:ring-1"
 					/>
 				</div>
@@ -61,11 +62,13 @@ export function CleaningGrid({ onView, onEdit, onDelete, userRole }: CleaningGri
 						<SelectItem value="all">{dict.SEARCH.ALL_STATUSES}</SelectItem>
 						{statusGroups.map((status: CleaningStatus) => {
 							const displayLabel =
-								!isHost && status === CLEANING_STATUS.CONFIRMED ? 'assigned' : status;
+								!isHost && status === CLEANING_STATUS.CONFIRMED
+									? dict.ASSIGNED
+									: status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ');
 
 							return (
 								<SelectItem key={status} value={status}>
-									{displayLabel.charAt(0).toUpperCase() + displayLabel.slice(1).replace('_', ' ')}
+									{displayLabel}
 								</SelectItem>
 							);
 						})}

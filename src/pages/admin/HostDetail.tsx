@@ -7,7 +7,6 @@ import { ConfirmActionDialog } from '@/components/ConfirmActionDialog';
 import { Loading } from '@/components/Loading';
 import { toast } from '@/components/Toast';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
 	Dialog,
 	DialogContent,
@@ -16,9 +15,9 @@ import {
 	DialogTitle,
 } from '@/components/ui/dialog';
 import { FormContainer } from '@/components/ui/form-container';
-import { Label } from '@/components/ui/label';
 import { DICT } from '@/dictionary';
 import { AssignPropertyCleanerDialog } from '@/features/admin/components/AssignPropertyCleanerDialog';
+import { CleaningsFilter } from '@/features/admin/components/CleaningsFilter';
 import { CleaningsTable } from '@/features/admin/components/CleaningsTable';
 import { PropertiesTable } from '@/features/admin/components/PropertiesTable';
 import { PropertyPriceDialog } from '@/features/admin/components/PropertyPriceDialog';
@@ -47,6 +46,9 @@ export function AdminHostDetailPage() {
 	const [propertiesSortDirection, setPropertiesSortDirection] = useState<'asc' | 'desc'>('desc');
 	const [cleaningsSortField, setCleaningsSortField] = useState<string>('date');
 	const [cleaningsSortDirection, setCleaningsSortDirection] = useState<'asc' | 'desc'>('desc');
+	const [cleaningsSearchQuery, setCleaningsSearchQuery] = useState('');
+	const [cleaningsStatusFilter, setCleaningsStatusFilter] = useState('all');
+	const [cleaningsCleanerFilter, setCleaningsCleanerFilter] = useState('all');
 	const [cleaningsUpcomingFilter, setCleaningsUpcomingFilter] = useState(false);
 	const [deletePropertyId, setDeletePropertyId] = useState<string | null>(null);
 	const [editingProperty, setEditingProperty] = useState<Property | null>(null);
@@ -273,12 +275,49 @@ export function AdminHostDetailPage() {
 	const stats = host?.cleaning_stats;
 
 	const filteredCleanings = useMemo(() => {
-		if (!cleaningsUpcomingFilter) {
-			return cleanings;
-		}
 		const now = new Date();
-		return cleanings.filter((c) => new Date(c.scheduled_start) >= now);
-	}, [cleanings, cleaningsUpcomingFilter]);
+		const normalizedSearch = cleaningsSearchQuery.trim().toLowerCase();
+		return cleanings.filter((c) => {
+			if (cleaningsUpcomingFilter && new Date(c.scheduled_start) < now) {
+				return false;
+			}
+			if (cleaningsStatusFilter !== 'all' && c.status !== cleaningsStatusFilter) {
+				return false;
+			}
+			if (cleaningsCleanerFilter === 'unassigned' && c.cleaner_id !== null) {
+				return false;
+			}
+			if (
+				cleaningsCleanerFilter !== 'all' &&
+				cleaningsCleanerFilter !== 'unassigned' &&
+				c.cleaner_id !== cleaningsCleanerFilter
+			) {
+				return false;
+			}
+			if (normalizedSearch) {
+				const property = properties.find((p) => p.id === c.property_id);
+				const haystack = [
+					c.cleaner_name,
+					property?.address_line_1,
+					property?.postcode,
+					property?.town_city,
+				]
+					.map((value) => (value ?? '').toLowerCase())
+					.join(' ');
+				if (!haystack.includes(normalizedSearch)) {
+					return false;
+				}
+			}
+			return true;
+		});
+	}, [
+		cleanings,
+		properties,
+		cleaningsUpcomingFilter,
+		cleaningsStatusFilter,
+		cleaningsCleanerFilter,
+		cleaningsSearchQuery,
+	]);
 
 	if (!host) {
 		return null;
@@ -386,16 +425,24 @@ export function AdminHostDetailPage() {
 					),
 					content: (
 						<div className="space-y-3">
-							<div className="flex items-center gap-2">
-								<Checkbox
-									id="host-cleanings-upcoming"
-									checked={cleaningsUpcomingFilter}
-									onCheckedChange={(checked) => setCleaningsUpcomingFilter(checked === true)}
-								/>
-								<Label htmlFor="host-cleanings-upcoming" className="text-sm cursor-pointer">
-									{DICT.ADMIN.CLEANINGS.FILTERS.ONLY_UPCOMING}
-								</Label>
-							</div>
+							<CleaningsFilter
+								searchQuery={cleaningsSearchQuery}
+								onSearchChange={setCleaningsSearchQuery}
+								searchDebounceMs={300}
+								statusFilter={cleaningsStatusFilter}
+								onStatusChange={setCleaningsStatusFilter}
+								cleanerFilter={cleaningsCleanerFilter}
+								onCleanerChange={setCleaningsCleanerFilter}
+								upcomingFilter={cleaningsUpcomingFilter}
+								onUpcomingChange={setCleaningsUpcomingFilter}
+								onClear={() => {
+									setCleaningsSearchQuery('');
+									setCleaningsStatusFilter('all');
+									setCleaningsCleanerFilter('all');
+									setCleaningsUpcomingFilter(false);
+								}}
+								availableCleaners={availableCleaners}
+							/>
 							<CleaningsTable
 								data={tableData}
 								fetchById={fetchCleaningById}
