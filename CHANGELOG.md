@@ -1,3 +1,5 @@
+## [0.16.0](https://github.com/freshers-co-ltd/freshers-tech-app/compare/v0.15.0...v0.16.0) (2026-08-03)
+
 ## [0.15.0](https://github.com/freshers-co-ltd/freshers-tech-app/compare/v0.14.0...v0.15.0) (2026-08-01)
 
 ## [0.14.0](https://github.com/freshers-co-ltd/freshers-tech-app/compare/v0.13.2...v0.14.0) (2026-07-31)
