@@ -93,8 +93,16 @@ export function useDashboardStats(): { stats: DashboardStats | null; isLoading: 
 			active: cleanings.filter((c) => c.status === CLEANING_STATUS.IN_PROGRESS).length,
 			completed: cleanings.filter((c) => c.status === CLEANING_STATUS.COMPLETED).length,
 			totalEarnings: cleanings
-				.filter((c) => c.status === CLEANING_STATUS.COMPLETED)
-				.reduce((sum, c) => sum + (c.cleaner_pay || 0), 0),
+				.filter((c) => {
+					const scheduled = new Date(c.scheduled_start);
+					const now = new Date();
+					return (
+						c.status === CLEANING_STATUS.COMPLETED &&
+						scheduled.getMonth() === now.getMonth() &&
+						scheduled.getFullYear() === now.getFullYear()
+					);
+				})
+				.reduce((sum, c) => sum + (c.cleaner_pay ?? 0), 0),
 		};
 	}, [cleanings, role]);
 

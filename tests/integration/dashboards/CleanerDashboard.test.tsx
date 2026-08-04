@@ -42,7 +42,14 @@ describe('Cleaner Dashboard', () => {
 		expect(await screen.findByText(dict.ASSIGNED)).toBeInTheDocument();
 		expect(screen.getByText(dict.ACTIVE)).toBeInTheDocument();
 		expect(screen.getByText(dict.COMPLETED)).toBeInTheDocument();
-		expect(screen.getByText(dict.TOTAL_EARNINGS)).toBeInTheDocument();
+		expect(
+			screen.getByText(
+				dict.TOTAL_EARNINGS.replace(
+					'{month}',
+					new Date().toLocaleDateString('en-GB', { month: 'long' }),
+				),
+			),
+		).toBeInTheDocument();
 	});
 
 	it('displays earnings in £X.XX format', async () => {
