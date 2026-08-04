@@ -33,7 +33,10 @@ export function CleanerDashboardPage() {
 			iconColor: 'text-warning-light',
 		},
 		{
-			label: dict.STATS.TOTAL_EARNINGS,
+			label: dict.STATS.TOTAL_EARNINGS.replace(
+				'{month}',
+				new Date().toLocaleDateString('en-GB', { month: 'long' }),
+			),
 			value: stats?.totalEarnings !== undefined ? `£${stats.totalEarnings.toFixed(2)}` : '£0.00',
 			icon: Banknote,
 			iconColor: 'text-success',

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef } from 'react';
 import type { Profile } from '@/features/auth/types';
 import { supabase } from '@/lib/supabaseClient';
 
+const CLEANINGS_EVENT_COALESCE_MS = 500;
+
 interface UseCleaningsRealtimeConfig {
 	user: { id: string } | null;
 	profile: Profile | null;
@@ -18,8 +20,30 @@ export function useCleaningsRealtime({
 	enabled = true,
 }: UseCleaningsRealtimeConfig) {
 	const cleaningChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+	const coalesceTimeoutRef = useRef<number | null>(null);
+	const onCleaningChangeRef = useRef(onCleaningChange);
+	onCleaningChangeRef.current = onCleaningChange;
+
+	const flushCleaningChange = useCallback(() => {
+		coalesceTimeoutRef.current = null;
+		onCleaningChangeRef.current();
+	}, []);
+
+	const scheduleCleaningChange = useCallback(() => {
+		if (coalesceTimeoutRef.current !== null) {
+			window.clearTimeout(coalesceTimeoutRef.current);
+		}
+		coalesceTimeoutRef.current = window.setTimeout(
+			flushCleaningChange,
+			CLEANINGS_EVENT_COALESCE_MS,
+		);
+	}, [flushCleaningChange]);
 
 	const cleanupChannel = useCallback(() => {
+		if (coalesceTimeoutRef.current !== null) {
+			window.clearTimeout(coalesceTimeoutRef.current);
+			coalesceTimeoutRef.current = null;
+		}
 		if (cleaningChannelRef.current) {
 			supabase.removeChannel(cleaningChannelRef.current);
 			cleaningChannelRef.current = null;
@@ -55,7 +79,7 @@ export function useCleaningsRealtime({
 					filter,
 				},
 				() => {
-					onCleaningChange();
+					scheduleCleaningChange();
 				},
 			)
 			.subscribe((status: string, err?: unknown) => {
@@ -65,7 +89,7 @@ export function useCleaningsRealtime({
 			});
 
 		cleaningChannelRef.current = newChannel;
-	}, [user, profile, onCleaningChange]);
+	}, [user, profile, scheduleCleaningChange]);
 
 	const setupChannelRef = useRef(setupChannel);
 	setupChannelRef.current = setupChannel;

@@ -266,7 +266,7 @@ export const DICT = {
 				ASSIGNED: 'Assigned Cleanings',
 				ACTIVE: 'Active Cleanings',
 				COMPLETED: 'Completed Cleanings',
-				TOTAL_EARNINGS: 'Total Earnings',
+				TOTAL_EARNINGS: 'Earnings for {month}',
 			},
 		},
 		ADMIN: {
