@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAuth } from '@/features/auth/AuthContext';
 import { useCleanings } from '@/features/cleanings/CleaningContext';
 import type { PropertyFormValues } from '@/features/properties/components/PropertyForm';
@@ -14,6 +14,7 @@ export function useHostProperties() {
 	const { properties, upsertProperty, deleteProperty, isLoading } = useProperties();
 	const { fetchCleanings } = useCleanings();
 	const modal = useResourceModals({ resourceName: 'property' });
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const viewingProperty = useMemo(() => {
 		return properties.find((p) => p.id === modal.viewId);
@@ -61,13 +62,18 @@ export function useHostProperties() {
 
 	const handleDelete = useCallback(async () => {
 		if (modal.deletingId) {
-			const result = await deleteProperty(modal.deletingId);
-			if (result.success) {
-				if (modal.viewId === modal.deletingId) {
-					modal.handleClose();
+			setIsDeleting(true);
+			try {
+				const result = await deleteProperty(modal.deletingId);
+				if (result.success) {
+					if (modal.viewId === modal.deletingId) {
+						modal.handleClose();
+					}
+					modal.setDeletingId(null);
+					await fetchCleanings();
 				}
-				modal.setDeletingId(null);
-				await fetchCleanings();
+			} finally {
+				setIsDeleting(false);
 			}
 		}
 	}, [deleteProperty, modal, fetchCleanings]);
@@ -78,6 +84,7 @@ export function useHostProperties() {
 		viewingProperty,
 		editingProperty,
 		modal,
+		isDeleting,
 		handleUpsert,
 		handleDelete,
 	};
