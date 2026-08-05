@@ -114,6 +114,21 @@ export function useTaskSync({ cleaning, updateTasksBatch }: UseTaskSyncOptions):
 	const updateTasksBatchRef = useRef(updateTasksBatch);
 	updateTasksBatchRef.current = updateTasksBatch;
 
+	const flushPendingSyncRef = useRef<() => void>(() => {});
+	flushPendingSyncRef.current = () => {
+		if (!shouldSyncOnUnmountRef.current) {
+			return;
+		}
+		const original = originalTasksRef.current;
+		const current = localTasksRef.current;
+		const id = cleaningIdRef.current;
+		const batch = updateTasksBatchRef.current;
+		const updates = computeUpdates(current, original);
+		if (updates.length > 0) {
+			batch(id, updates).catch(() => {});
+		}
+	};
+
 	useEffect(() => {
 		if (!hasLocalChanges) {
 			return;
@@ -140,6 +155,7 @@ export function useTaskSync({ cleaning, updateTasksBatch }: UseTaskSyncOptions):
 		}
 
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			flushPendingSyncRef.current();
 			e.preventDefault();
 			e.returnValue = '';
 		};
@@ -154,16 +170,7 @@ export function useTaskSync({ cleaning, updateTasksBatch }: UseTaskSyncOptions):
 				clearTimeout(debounceTimerRef.current);
 			}
 
-			if (shouldSyncOnUnmountRef.current) {
-				const original = originalTasksRef.current;
-				const current = localTasksRef.current;
-				const id = cleaningIdRef.current;
-				const batch = updateTasksBatchRef.current;
-				const updates = computeUpdates(current, original);
-				if (updates.length > 0) {
-					batch(id, updates).catch(() => {});
-				}
-			}
+			flushPendingSyncRef.current();
 		};
 	}, []);
 

@@ -56,6 +56,25 @@ describe('useTaskSync', () => {
 		mockUpdateTasksBatch = vi.fn().mockResolvedValue({ success: true });
 	});
 
+	it('flushes pending changes on beforeunload', () => {
+		const cleaning = createCleaning({ status: CLEANING_STATUS.IN_PROGRESS });
+		const { result } = renderHook(() =>
+			useTaskSync({ cleaning, updateTasksBatch: mockUpdateTasksBatch }),
+		);
+
+		act(() => {
+			result.current.handleTaskToggle('task_1');
+		});
+
+		act(() => {
+			window.dispatchEvent(new Event('beforeunload', { cancelable: true }));
+		});
+
+		expect(mockUpdateTasksBatch).toHaveBeenCalledWith('cleaning_123', [
+			{ id: 'task_1', is_completed: true },
+		]);
+	});
+
 	it('initialises localTasks from cleaning.tasks', () => {
 		const cleaning = createCleaning();
 		const { result } = renderHook(() =>
