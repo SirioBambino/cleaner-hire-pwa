@@ -141,9 +141,16 @@ export function useCleaningsOperations(setCleanings: Dispatch<SetStateAction<Cle
 
 	const updateTasksBatch = useCallback(
 		async (cleaningId: string, updates: TaskUpdate[]) => {
-			const snapshotRef: { current: CleaningRequest[] } = { current: [] };
+			const originalValues = new Map<string, boolean>();
 			setCleanings((prev) => {
-				snapshotRef.current = prev;
+				const target = prev.find((c) => c.id === cleaningId);
+				if (target) {
+					for (const task of target.tasks ?? []) {
+						if (updates.some((u) => u.id === task.id)) {
+							originalValues.set(task.id, task.is_completed);
+						}
+					}
+				}
 				return prev.map((c) => {
 					if (c.id === cleaningId) {
 						return {
@@ -175,18 +182,15 @@ export function useCleaningsOperations(setCleanings: Dispatch<SetStateAction<Cle
 							...c,
 							tasks: c.tasks?.map((t) => {
 								if (failedIds.has(t.id)) {
-									return (
-										snapshotRef.current
-											.find((s) => s.id === cleaningId)
-											?.tasks?.find((st) => st.id === t.id) ?? t
-									);
+									const original = originalValues.get(t.id);
+									return original === undefined ? t : { ...t, is_completed: original };
 								}
 								return t;
 							}),
 						};
 					}),
 				);
-				toast.error('Some tasks failed to save.');
+				toast.error(DICT.CLEANINGS.DETAIL.TASKS.TOAST_SAVE_FAILED);
 				return { success: false };
 			}
 

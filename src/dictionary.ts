@@ -375,6 +375,9 @@ export const DICT = {
 			TOILETRIES_RESTOCK: 'Toiletries Restock',
 			RESTOCK_INCLUDED: 'Included',
 			RESTOCK_NOT_INCLUDED: 'Not Included',
+			TASKS: {
+				TOAST_SAVE_FAILED: 'Some tasks failed to save.',
+			},
 			TOAST_ERROR: 'Failed to load cleaning details',
 		},
 		SEARCH: {
