@@ -49,11 +49,15 @@ function createCleaning(overrides?: Partial<CleaningRequest>): CleaningRequest {
 }
 
 describe('useTaskSync', () => {
-	let mockUpdateTasksBatch: ReturnType<typeof vi.fn>;
+	type UpdateTasksBatch = (
+		cleaningId: string,
+		updates: { id: string; is_completed: boolean }[],
+	) => Promise<{ success: boolean }>;
+	let mockUpdateTasksBatch: UpdateTasksBatch;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		mockUpdateTasksBatch = vi.fn().mockResolvedValue({ success: true });
+		mockUpdateTasksBatch = vi.fn<UpdateTasksBatch>().mockResolvedValue({ success: true });
 	});
 
 	it('flushes pending changes on beforeunload', () => {

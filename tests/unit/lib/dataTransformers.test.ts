@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { Property } from '@/features/properties/types';
 import {
 	isRawCleaningQueryResult,
 	normaliseCleaningRequest,
@@ -52,7 +53,7 @@ describe('normaliseCleaningRequest', () => {
 			updated_at: '2026-06-28T10:00:00Z',
 			deleted_at: null,
 			cleaning_tasks: [],
-			property: { id: 'prop_1', address_line_1: '123 Street' },
+			property: { id: 'prop_1', address_line_1: '123 Street' } as unknown as Property,
 			cleaner: null,
 			evidence: [],
 			cleaning_reports: null,

@@ -72,7 +72,6 @@ describe('Cleaner Cleanings Page', () => {
 	});
 
 	it('shows IN_PROGRESS status with Finish button', async () => {
-		const _user = userEvent.setup();
 		setMockUserRole('cleaner');
 		cleanupFrom = mockTableData('cleanings', [
 			buildRawCleaning({
