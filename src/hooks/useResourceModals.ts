@@ -28,6 +28,10 @@ export function useResourceModals(options: UseResourceModalsOptions) {
 
 	const [deletingId, setDeletingId] = useState<string | null>(null);
 
+	// Defer the following URL state updates to the next task so the currently
+	// open Dialog begins its Radix exit animation before another Dialog mounts.
+	// Updating both in the same batch mounts two Dialogs simultaneously, which
+	// breaks Radix focus/scroll handling and can prevent the next Dialog opening.
 	const handleClose = () => {
 		setEditId(null);
 		setTimeout(() => {
@@ -36,6 +40,7 @@ export function useResourceModals(options: UseResourceModalsOptions) {
 		}, 0);
 	};
 
+	// Same sequencing as handleClose: close the view Dialog before opening edit.
 	const openEdit = (id: string) => {
 		setViewId(null);
 		setTimeout(() => {

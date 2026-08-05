@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { DICT } from '@/dictionary';
+import { CONFIG } from '@/lib/config';
 
 const CHUNK_RECOVERY_KEY = 'sw:recovering_chunk';
 
@@ -81,9 +82,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 		}
 
 		if (isChunkLoadError(error)) {
-			const alreadyRecovering = sessionStorage.getItem(CHUNK_RECOVERY_KEY) === 'true';
-			if (!alreadyRecovering) {
-				sessionStorage.setItem(CHUNK_RECOVERY_KEY, 'true');
+			const lastAttempt = Number(sessionStorage.getItem(CHUNK_RECOVERY_KEY) ?? 0);
+			const elapsed = Number.isFinite(lastAttempt) ? Date.now() - lastAttempt : Infinity;
+			if (elapsed > CONFIG.CHUNK_RECOVERY_COOLDOWN_MS) {
+				sessionStorage.setItem(CHUNK_RECOVERY_KEY, String(Date.now()));
 				window.location.reload();
 			}
 		}

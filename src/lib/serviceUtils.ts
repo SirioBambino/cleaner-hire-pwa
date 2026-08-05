@@ -1,4 +1,3 @@
-import type { AuthError, PostgrestError } from '@supabase/supabase-js';
 import { DICT } from '@/dictionary';
 
 export interface ActionResult<T> {
@@ -6,7 +5,15 @@ export interface ActionResult<T> {
 	error: string | null;
 }
 
-export const mapDatabaseError = (error: PostgrestError | AuthError): string => {
+export interface MappableError {
+	name?: string;
+	code?: string;
+	message?: string;
+	details?: string;
+	hint?: string;
+}
+
+export const mapDatabaseError = (error: MappableError): string => {
 	const errorMap: Record<string, string> = {
 		PGRST116: DICT.ERRORS.DATABASE.RECORD_NOT_FOUND,
 		'42501': DICT.ERRORS.DATABASE.PERMISSION_DENIED,

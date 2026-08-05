@@ -3,7 +3,7 @@ import { DICT } from '@/dictionary';
 import type { AuthActionResult, UserRole } from '@/features/auth/types';
 import { supabase, supabaseImplicit } from '@/lib/supabaseClient';
 
-export const mapAuthError = (error: AuthError): string => {
+export const mapAuthError = (error: { code?: string; message: string }): string => {
 	switch (error.code) {
 		case 'user_already_exists':
 			return DICT.ERRORS.AUTH.USER_EXISTS;
