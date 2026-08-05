@@ -67,9 +67,10 @@ export function useAdminUsers(): UseAdminUsersResult {
 	const limit = 20;
 	const pageRef = useRef(page);
 	pageRef.current = page;
+	const countFiltersKeyRef = useRef('');
 
 	const fetchData = useCallback(
-		async (targetPage: number, mode: 'replace' | 'append' = 'replace') => {
+		async (targetPage: number, mode: 'replace' | 'append' = 'replace', forceCount = false) => {
 			if (mode === 'replace') {
 				setLoading(true);
 			} else {
@@ -86,10 +87,16 @@ export function useAdminUsers(): UseAdminUsersResult {
 				role: roleMap[onlineTab],
 				search: searchQuery || undefined,
 			};
-			const [usersResult, countResult] = await Promise.all([
-				userService.getUsers(filters, targetPage, limit, sortField, sortDirection),
-				userService.getUsersCount(filters),
-			]);
+			const countKey = `${filters.role ?? ''}|${filters.search ?? ''}`;
+			const shouldFetchCount = forceCount || countKey !== countFiltersKeyRef.current;
+
+			const usersResult = await userService.getUsers(
+				filters,
+				targetPage,
+				limit,
+				sortField,
+				sortDirection,
+			);
 			if (usersResult.error) {
 				toast.error(usersResult.error);
 			} else {
@@ -101,8 +108,13 @@ export function useAdminUsers(): UseAdminUsersResult {
 				}
 				setUsers(pageData);
 			}
-			if (!countResult.error) {
-				setTotalCount(countResult.data || 0);
+
+			if (shouldFetchCount) {
+				countFiltersKeyRef.current = countKey;
+				const countResult = await userService.getUsersCount(filters);
+				if (!countResult.error) {
+					setTotalCount(countResult.data || 0);
+				}
 			}
 
 			if (mode === 'replace') {
@@ -115,7 +127,7 @@ export function useAdminUsers(): UseAdminUsersResult {
 	);
 
 	const refetchCurrentPage = useCallback(() => {
-		return fetchData(page, 'replace');
+		return fetchData(page, 'replace', true);
 	}, [fetchData, page]);
 
 	const fetchCounts = useCallback(async () => {
@@ -123,7 +135,6 @@ export function useAdminUsers(): UseAdminUsersResult {
 		if (!statsResult.error && statsResult.data) {
 			setOnlineCount(statsResult.data.online_now);
 			setBannedCount(statsResult.data.banned_users);
-			setTotalCount(statsResult.data.total_users);
 			setRecentlyOnline(statsResult.data.recently_online);
 		}
 	}, []);

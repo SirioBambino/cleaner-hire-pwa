@@ -19,6 +19,7 @@ export function HostCleaningsPage() {
 		modal,
 		handleUpsert,
 		handleDelete,
+		isDeleting,
 		pendingFormValues,
 		confirmCreate,
 		cancelCreate,
@@ -81,6 +82,7 @@ export function HostCleaningsPage() {
 				deletingId={modal.deletingId}
 				onDeleteCancel={() => modal.setDeletingId(null)}
 				onDeleteConfirm={handleDelete}
+				isDeleting={isDeleting}
 				deleteTitle={DICT.CLEANINGS.DELETE.TITLE}
 				deleteMessage={DICT.CLEANINGS.DELETE.MESSAGE}
 			/>

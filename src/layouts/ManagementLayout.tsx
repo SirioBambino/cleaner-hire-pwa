@@ -31,6 +31,7 @@ interface ManagementLayoutProps {
 	deletingId: string | null;
 	onDeleteCancel: () => void;
 	onDeleteConfirm: () => Promise<void>;
+	isDeleting?: boolean;
 	deleteTitle: string;
 	deleteMessage: string;
 }
@@ -52,6 +53,7 @@ export function ManagementLayout({
 	deletingId,
 	onDeleteCancel,
 	onDeleteConfirm,
+	isDeleting = false,
 	deleteTitle,
 	deleteMessage,
 }: ManagementLayoutProps) {
@@ -92,8 +94,9 @@ export function ManagementLayout({
 						<AlertDialogCancel>{DICT.COMMON.ACTIONS.BACK}</AlertDialogCancel>
 						<AlertDialogAction
 							className="bg-destructive text-white hover:bg-destructive/90"
+							disabled={isDeleting}
 							onClick={onDeleteConfirm}>
-							{DICT.COMMON.ACTIONS.DELETE}
+							{isDeleting ? DICT.COMMON.ACTIONS.DELETING : DICT.COMMON.ACTIONS.DELETE}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

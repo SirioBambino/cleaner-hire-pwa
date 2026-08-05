@@ -17,6 +17,7 @@ export function HostPropertiesPage() {
 		viewingProperty,
 		editingProperty,
 		modal,
+		isDeleting,
 		handleUpsert,
 		handleDelete,
 	} = useHostProperties();
@@ -77,6 +78,7 @@ export function HostPropertiesPage() {
 			deletingId={modal.deletingId}
 			onDeleteCancel={() => modal.setDeletingId(null)}
 			onDeleteConfirm={handleDelete}
+			isDeleting={isDeleting}
 			deleteTitle={DICT.PROPERTIES.DELETE.TITLE}
 			deleteMessage={DICT.PROPERTIES.DELETE.MESSAGE}
 		/>

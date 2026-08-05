@@ -1,6 +1,7 @@
 'use client';
 
 import { z } from 'zod';
+import { DICT } from '@/dictionary';
 import type {
 	AdminCleanerDetail,
 	AdminHostDetail,
@@ -266,15 +267,28 @@ export const userService = {
 		try {
 			const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 			const edgeFunctionUrl = `${supabaseUrl}/functions/v1/invite-user`;
-			const {
+
+			let {
 				data: { session },
 			} = await supabase.auth.getSession();
+
+			if (
+				session == null ||
+				(session.expires_at != null && session.expires_at * 1000 <= Date.now())
+			) {
+				const { data: refreshed } = await supabase.auth.refreshSession();
+				session = refreshed.session;
+			}
+
+			if (!session) {
+				return { data: null, error: DICT.AUTH.LOGIN.TOAST_SESSION_EXPIRED };
+			}
 
 			const response = await fetch(edgeFunctionUrl, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${session?.access_token}`,
+					Authorization: `Bearer ${session.access_token}`,
 				},
 				body: JSON.stringify({
 					email,
@@ -285,6 +299,10 @@ export const userService = {
 			});
 
 			const result = await response.json();
+
+			if (response.status === 401) {
+				return { data: null, error: DICT.AUTH.LOGIN.TOAST_SESSION_EXPIRED };
+			}
 
 			if (!response.ok || result.error) {
 				return { data: null, error: result.error || 'Failed to invite user' };

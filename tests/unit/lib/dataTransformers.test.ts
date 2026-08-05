@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import type { Property } from '@/features/properties/types';
 import {
 	isRawCleaningQueryResult,
 	normaliseCleaningRequest,
 } from '@/features/cleanings/services/cleaningRequestService';
+import type { Property } from '@/features/properties/types';
 
 describe('isRawCleaningQueryResult', () => {
 	it('returns true for a valid raw result with id and tasks array', () => {

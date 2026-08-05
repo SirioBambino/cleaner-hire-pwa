@@ -10,6 +10,7 @@ export function useHostCleanings() {
 	const { cleanings, isLoading, upsertCleaning, deleteCleaning } = useCleanings();
 	const modal = useResourceModals({ resourceName: 'cleaning' });
 	const [pendingFormValues, setPendingFormValues] = useState<CleaningFormValues | null>(null);
+	const [isDeleting, setIsDeleting] = useState(false);
 
 	const viewingCleaning = useMemo(
 		() => cleanings.find((c) => c.id === modal.viewId),
@@ -60,12 +61,17 @@ export function useHostCleanings() {
 
 	const handleDelete = useCallback(async () => {
 		if (modal.deletingId) {
-			const result = await deleteCleaning(modal.deletingId);
-			if (result.success) {
-				if (modal.viewId === modal.deletingId) {
-					modal.handleClose();
+			setIsDeleting(true);
+			try {
+				const result = await deleteCleaning(modal.deletingId);
+				if (result.success) {
+					if (modal.viewId === modal.deletingId) {
+						modal.handleClose();
+					}
+					modal.setDeletingId(null);
 				}
-				modal.setDeletingId(null);
+			} finally {
+				setIsDeleting(false);
 			}
 		}
 	}, [deleteCleaning, modal]);
@@ -89,6 +95,7 @@ export function useHostCleanings() {
 		modal,
 		handleUpsert,
 		handleDelete,
+		isDeleting,
 		pendingFormValues,
 		confirmCreate,
 		cancelCreate,

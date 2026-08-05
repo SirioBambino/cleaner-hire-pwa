@@ -14,6 +14,7 @@ export const DICT = {
 			CREATE: 'Create',
 			CREATE_CLEANING: 'Create Cleaning Request',
 			DELETE: 'Delete',
+			DELETING: 'Deleting...',
 			EDIT: 'Edit',
 			REASSIGN: 'Reassign',
 			REQUEST_CLEANING: 'Request Cleaning',
