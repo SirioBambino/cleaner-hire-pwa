@@ -120,6 +120,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		const initializeAuth = async () => {
 			await initAuthSync();
 
+			if (!isMounted || typeof window === 'undefined') {
+				return;
+			}
+
 			const hash = window.location.hash || '';
 			const search = window.location.search || '';
 			const isInviteFlow = window.location.pathname === '/set-password';
@@ -218,7 +222,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 			}
 		};
 
-		initializeAuth();
+		initializeAuth().catch((err) => {
+			if (import.meta.env.DEV) {
+				console.error('[Auth] Failed to initialise auth', err);
+			}
+		});
 
 		const {
 			data: { subscription },

@@ -21,7 +21,7 @@ export function useCleanerDetail(
 	cleanerId: string | undefined,
 	options: UseCleanerDetailOptions = {},
 ): UseCleanerDetailResult {
-	const { cleaningsSortField = 'scheduled_start', cleaningsSortDirection = 'desc' } = options;
+	const { cleaningsSortField = 'date', cleaningsSortDirection = 'desc' } = options;
 
 	const [cleaner, setCleaner] = useState<AdminCleanerDetail | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -68,10 +68,6 @@ export function useCleanerDetail(
 	}, []);
 
 	useEffect(() => {
-		if (import.meta.env.DEV) {
-			return;
-		}
-
 		if (!cleanerId) {
 			cleanupChannel();
 			return;
@@ -92,7 +88,11 @@ export function useCleanerDetail(
 					fetchCleanerDetail();
 				},
 			)
-			.subscribe();
+			.subscribe((status: string, err?: unknown) => {
+				if (err && import.meta.env.PROD) {
+					console.error('[Admin] Cleaner detail channel error', { status, error: err });
+				}
+			});
 
 		channelRef.current = channel;
 

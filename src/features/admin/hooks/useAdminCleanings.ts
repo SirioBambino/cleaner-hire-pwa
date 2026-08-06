@@ -179,10 +179,6 @@ export function useAdminCleanings(): UseAdminCleaningsResult {
 	}, []);
 
 	const setupChannel = useCallback(() => {
-		if (import.meta.env.DEV) {
-			return;
-		}
-
 		if (cleaningChannelRef.current) {
 			return;
 		}
@@ -200,7 +196,11 @@ export function useAdminCleanings(): UseAdminCleaningsResult {
 					fetchData(page, 'replace');
 				},
 			)
-			.subscribe();
+			.subscribe((status: string, err?: unknown) => {
+				if (err && import.meta.env.PROD) {
+					console.error('[Admin] Cleanings channel error', { status, error: err });
+				}
+			});
 
 		cleaningChannelRef.current = newChannel;
 	}, [fetchData, page]);

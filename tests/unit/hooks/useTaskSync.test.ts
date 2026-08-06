@@ -179,12 +179,10 @@ describe('useTaskSync', () => {
 		});
 		expect(mockUpdateTasksBatch).not.toHaveBeenCalled();
 
-		act(() => {
+		await act(async () => {
 			vi.advanceTimersByTime(1);
 		});
-		await vi.waitFor(() => {
-			expect(mockUpdateTasksBatch).toHaveBeenCalled();
-		});
+		expect(mockUpdateTasksBatch).toHaveBeenCalled();
 
 		vi.useRealTimers();
 	});
