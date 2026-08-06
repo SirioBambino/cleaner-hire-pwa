@@ -96,6 +96,7 @@ export const DICT = {
 		},
 		VALIDATION: {
 			ADDRESS_REQUIRED: 'Address is required',
+			ADDRESS_MAX: 'Address must be no more than 100 characters',
 			EMAIL_INVALID: 'Invalid email address',
 			IMAGE_LIMIT: 'Maximum of 10 additional images allowed',
 			IMAGE_REQUIRED: 'A main image is required',
@@ -112,6 +113,7 @@ export const DICT = {
 			PASSWORDS_MATCH: "Passwords don't match",
 			POSTCODE_INVALID: 'Enter a valid UK postcode',
 			TOWN_REQUIRED: 'Town or City is required',
+			TOWN_MAX: 'Town or City must be no more than 50 characters',
 		},
 		LOADING: { MESSAGE: 'Please wait...', TITLE: 'Loading' },
 		CURRENCY: '£',
@@ -417,6 +419,11 @@ export const DICT = {
 				PROCESSING: 'Processing...',
 			},
 			INFO: { PRICING_NOTICE: 'Price is calculated based on property size and standard tasks.' },
+			VALIDATION: {
+				TASK_DESCRIPTION_REQUIRED: 'Task description is required',
+				TASK_DESCRIPTION_MAX: 'Task description must be no more than 100 characters',
+				INFORMATION_MAX: 'Additional information must be no more than 500 characters',
+			},
 			LOADING_TASKS: 'Loading tasks...',
 			NO_TASKS: 'No standard tasks available',
 			FAILED_TASKS: 'Failed to load tasks',

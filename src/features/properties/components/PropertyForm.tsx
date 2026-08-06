@@ -33,9 +33,15 @@ const POSTCODE_REGEX = /^[A-Z]{1,2}[0-9][A-Z0-9]?\s?[0-9][A-Z]{2}$/i;
 
 const propertySchema = z
 	.object({
-		address_line_1: z.string().min(1, DICT.COMMON.VALIDATION.ADDRESS_REQUIRED),
-		address_line_2: z.string().optional(),
-		town_city: z.string().min(1, DICT.COMMON.VALIDATION.TOWN_REQUIRED),
+		address_line_1: z
+			.string()
+			.min(1, DICT.COMMON.VALIDATION.ADDRESS_REQUIRED)
+			.max(100, DICT.COMMON.VALIDATION.ADDRESS_MAX),
+		address_line_2: z.string().max(100, DICT.COMMON.VALIDATION.ADDRESS_MAX).optional(),
+		town_city: z
+			.string()
+			.min(1, DICT.COMMON.VALIDATION.TOWN_REQUIRED)
+			.max(50, DICT.COMMON.VALIDATION.TOWN_MAX),
 		postcode: z
 			.string()
 			.regex(POSTCODE_REGEX, DICT.COMMON.VALIDATION.POSTCODE_INVALID)
