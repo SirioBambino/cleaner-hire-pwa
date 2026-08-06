@@ -93,7 +93,17 @@ const StatusBreakdownSchema = z.object({
 	count: z.number(),
 });
 
-type RpcParams = Record<string, unknown>;
+const AuditLogEntrySchema = z.object({
+	id: z.string(),
+	actor_id: z.string().nullable(),
+	target_id: z.string(),
+	target_table: z.string(),
+	action_type: z.string(),
+	old_data: z.record(z.string(), z.unknown()).nullable(),
+	new_data: z.record(z.string(), z.unknown()).nullable(),
+	created_at: z.string(),
+	actor_name: z.string().nullable(),
+});
 
 export const analyticsService = {
 	async getPlatformStats(): Promise<ActionResult<PlatformStats>> {
@@ -131,7 +141,11 @@ export const analyticsService = {
 			return { data: null, error: mapDatabaseError(error) };
 		}
 
-		return { data: (data ?? []) as unknown as AuditLogEntry[], error: null };
+		const auditLogs = validateArray<AuditLogEntry>(AuditLogEntrySchema, data ?? [], 'AuditLogs');
+		if (!auditLogs.valid) {
+			return { data: null, error: auditLogs.error };
+		}
+		return { data: auditLogs.data, error: null };
 	},
 
 	async getUserStats(): Promise<ActionResult<UserStats>> {
@@ -153,11 +167,9 @@ export const analyticsService = {
 	},
 
 	async getRevenueMetrics(): Promise<ActionResult<RevenueMetrics>> {
-		const fnName = 'admin_get_revenue_metrics' as const;
-		const { data, error } = await supabase.rpc(
-			fnName as Parameters<typeof supabase.rpc>[0],
-			{ p_months: 1 } as RpcParams,
-		);
+		const { data, error } = await supabase.rpc('admin_get_revenue_metrics', {
+			p_months: 1,
+		});
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };
@@ -179,11 +191,9 @@ export const analyticsService = {
 	},
 
 	async getMonthlyStats(): Promise<ActionResult<MonthlyStats[]>> {
-		const fnName = 'admin_get_monthly_stats' as const;
-		const { data, error } = await supabase.rpc(
-			fnName as Parameters<typeof supabase.rpc>[0],
-			{ p_months: 6 } as RpcParams,
-		);
+		const { data, error } = await supabase.rpc('admin_get_monthly_stats', {
+			p_months: 6,
+		});
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };
@@ -201,11 +211,9 @@ export const analyticsService = {
 	},
 
 	async getUserGrowthByMonth(): Promise<ActionResult<UserGrowthByMonth[]>> {
-		const fnName = 'admin_get_user_growth_by_month' as const;
-		const { data, error } = await supabase.rpc(
-			fnName as Parameters<typeof supabase.rpc>[0],
-			{ p_months: 6 } as RpcParams,
-		);
+		const { data, error } = await supabase.rpc('admin_get_user_growth_by_month', {
+			p_months: 6,
+		});
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };
@@ -223,8 +231,7 @@ export const analyticsService = {
 	},
 
 	async getActiveCleanings(): Promise<ActionResult<StatusBreakdown[]>> {
-		const fnName = 'admin_get_active_cleanings' as const;
-		const { data, error } = await supabase.rpc(fnName as Parameters<typeof supabase.rpc>[0]);
+		const { data, error } = await supabase.rpc('admin_get_active_cleanings');
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };
@@ -242,8 +249,7 @@ export const analyticsService = {
 	},
 
 	async getCleaningsOverTime(): Promise<ActionResult<MonthlyStats[]>> {
-		const fnName = 'admin_get_cleanings_over_time' as const;
-		const { data, error } = await supabase.rpc(fnName as Parameters<typeof supabase.rpc>[0]);
+		const { data, error } = await supabase.rpc('admin_get_cleanings_over_time');
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };
@@ -261,8 +267,7 @@ export const analyticsService = {
 	},
 
 	async getRevenueOverTime(): Promise<ActionResult<MonthlyStats[]>> {
-		const fnName = 'admin_get_revenue_over_time' as const;
-		const { data, error } = await supabase.rpc(fnName as Parameters<typeof supabase.rpc>[0]);
+		const { data, error } = await supabase.rpc('admin_get_revenue_over_time');
 
 		if (error) {
 			return { data: null, error: mapDatabaseError(error) };

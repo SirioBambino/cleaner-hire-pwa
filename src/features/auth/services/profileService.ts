@@ -6,14 +6,14 @@ export const profileService = {
 	async getProfile(userId: string): Promise<{ data: Profile | null; error: string | null }> {
 		const { data, error } = await supabase
 			.from('profiles')
-			.select('id, full_name, avatar_url, role, deleted_at, is_verified')
+			.select('id, email, full_name, avatar_url, role, deleted_at, is_verified')
 			.eq('id', userId)
 			.single();
 
 		if (error) {
 			return { data: null, error: error.message };
 		}
-		return { data: data as unknown as Profile, error: null };
+		return { data: data as Profile, error: null };
 	},
 
 	async updateProfile(
@@ -42,7 +42,7 @@ export const profileService = {
 		try {
 			const fetchPromise = supabase
 				.from('profiles')
-				.select('id, full_name, avatar_url, role, deleted_at, is_verified')
+				.select('id, email, full_name, avatar_url, role, deleted_at, is_verified')
 				.eq('id', userId)
 				.single();
 			const { data, error } = (await Promise.race([
@@ -58,7 +58,7 @@ export const profileService = {
 				return { data: null, error: null };
 			}
 
-			return { data: data as unknown as Profile, error: null };
+			return { data: data as Profile, error: null };
 		} catch (err: unknown) {
 			if (retryCount < 2 && !(err instanceof Error && err.name === 'AbortError')) {
 				await new Promise((resolve) => setTimeout(resolve, 2000));
