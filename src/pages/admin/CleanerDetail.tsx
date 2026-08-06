@@ -20,7 +20,7 @@ import { formatHours } from '@/lib/utils';
 export function AdminCleanerDetailPage() {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-	const [cleaningsSortField, setCleaningsSortField] = useState<string>('scheduled_start');
+	const [cleaningsSortField, setCleaningsSortField] = useState<string>('date');
 	const [cleaningsSortDirection, setCleaningsSortDirection] = useState<'asc' | 'desc'>('desc');
 	const [cleaningsSearchQuery, setCleaningsSearchQuery] = useState('');
 	const [cleaningsStatusFilter, setCleaningsStatusFilter] = useState('all');

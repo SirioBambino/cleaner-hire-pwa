@@ -83,10 +83,6 @@ export function useHostDetail(
 	}, []);
 
 	useEffect(() => {
-		if (import.meta.env.DEV) {
-			return;
-		}
-
 		if (!hostId) {
 			cleanupChannel();
 			return;
@@ -108,7 +104,11 @@ export function useHostDetail(
 					fetchHostDetail();
 				},
 			)
-			.subscribe();
+			.subscribe((status: string, err?: unknown) => {
+				if (err && import.meta.env.PROD) {
+					console.error('[Admin] Host detail channel error', { status, error: err });
+				}
+			});
 
 		channelRef.current = channel;
 
