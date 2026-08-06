@@ -107,7 +107,7 @@ export function useGeolocation() {
 
 			try {
 				const response = await fetch(
-					`https://api.postcodes.io/postcodes/${postcode.replace(/\s+/g, '')}`,
+					`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode.replace(/\s+/g, ''))}`,
 				);
 				const data: PostcodeResult = await response.json();
 

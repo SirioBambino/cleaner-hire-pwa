@@ -32,7 +32,13 @@ export function useInactivityLogout(timeoutMs = CONFIG.INACTIVITY_TIMEOUT_MS) {
 	}, [timeoutMs, logout]);
 
 	useEffect(() => {
-		const isTrusted = localStorage.getItem('trust_device') === 'true';
+		let isTrusted = false;
+		try {
+			isTrusted = localStorage.getItem('trust_device') === 'true';
+		} catch {
+			// localStorage can throw when storage access is blocked (private mode or disabled cookies)
+			isTrusted = false;
+		}
 		if (isTrusted) {
 			return;
 		}

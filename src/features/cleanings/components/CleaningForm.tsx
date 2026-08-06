@@ -33,12 +33,17 @@ const cleaningFormSchema = z.object({
 		message: 'Please select a valid property',
 	}),
 	scheduled_start: z.date({ message: 'Please select a start date' }),
-	information: z.string().optional(),
+	information: z.string().max(500, DICT.CLEANINGS.FORM.VALIDATION.INFORMATION_MAX).optional(),
 	stocks_included: z.boolean(),
 	cleaner_pay: z.optional(z.nullable(z.number())),
 	service_cost: z.optional(z.nullable(z.number())),
 	custom_tasks: z.array(
-		z.object({ description: z.string().min(1, { message: 'Task description required' }) }),
+		z.object({
+			description: z
+				.string()
+				.min(1, { message: DICT.CLEANINGS.FORM.VALIDATION.TASK_DESCRIPTION_REQUIRED })
+				.max(100, { message: DICT.CLEANINGS.FORM.VALIDATION.TASK_DESCRIPTION_MAX }),
+		}),
 	),
 });
 
