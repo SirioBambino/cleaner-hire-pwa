@@ -592,6 +592,7 @@ export const DICT = {
 			},
 			TASKS: { TITLE: 'Standard Tasks', ADD: 'Add Task', EDIT: 'Edit', SAVE: 'Save Changes' },
 			CONFLICT: 'Data was updated by another user. Please refresh.',
+			ERROR_INVALID_PAY_CONFIG: 'Invalid pay configuration returned by the server',
 			FILTERS: {
 				SEARCH_PLACEHOLDER: 'Search...',
 				STATUS: 'Status',
